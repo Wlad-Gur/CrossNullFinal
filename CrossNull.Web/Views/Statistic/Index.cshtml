@@ -1,0 +1,29 @@
+﻿@model IEnumerable<CrossNull.Logic.Models.GameScore>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>IndexStatistic</h2>
+
+<body>
+    <div>
+        <h3>@ViewBag.Message</h3>
+        <h4>Tratatata</h4>
+        <table>
+            <tr>
+                <td><p>Имя</p></td>
+                <td><p>Количество побед</p></td>
+                <td></td>
+            </tr>
+
+            @foreach (var player in Model)
+            {
+                <tr>
+                    <td><p>@player.Name</p></td>
+                    <td><p>@player.CountWin</p></td>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
+
