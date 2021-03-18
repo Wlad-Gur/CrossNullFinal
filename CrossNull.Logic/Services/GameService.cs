@@ -15,6 +15,7 @@ namespace CrossNull.Logic.Services
     {
         private GameModel _gameProg;
         private GameContext _db;
+        private GameStateDb _gameStateDb;
         public GameService(GameContext gameContext)
         {
             _db = gameContext;
@@ -28,7 +29,7 @@ namespace CrossNull.Logic.Services
                 var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
                 gamesDict.Add(item.Id, game);
             }
-           return gamesDict.ElementAtOrDefault(id).Value;
+            return gamesDict.ElementAtOrDefault(id).Value;
         }
 
         public Dictionary<int, GameModel> LoadAll()
@@ -42,14 +43,14 @@ namespace CrossNull.Logic.Services
             }
             return gamesDict;
         }
-
+        //TODO    SaveStep();
         public GameModel StartNew(Player playerOne, Player playerTwo)
         {
 
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
             _gameProg.PlayerTwo = playerTwo;
-
+            SaveStep(_gameProg);
             return _gameProg;
         }
 
@@ -61,11 +62,15 @@ namespace CrossNull.Logic.Services
 
         public GameModel Step(GameModel gameModels)
         {
+
             throw new NotImplementedException();
         }
 
-        private void SaveStep()
+        private void SaveStep(GameModel _gameProg)
         {
+            _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
+            _db.Games.Add(_gameStateDb);
+            _db.SaveChanges();  // When exiting the method, will I lose data ?
 
         }
     }
