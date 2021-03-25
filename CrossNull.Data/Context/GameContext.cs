@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace CrossNull.Data
 {
@@ -12,7 +13,9 @@ namespace CrossNull.Data
     {
         public GameContext() : this("DbConnection22")
         {
-
+#if DEBUG
+            Database.Log = l => Debug.WriteLine(l);
+#endif
         }
         public GameContext(string connectionString) : base(connectionString)
         {

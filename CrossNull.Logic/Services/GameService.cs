@@ -20,6 +20,12 @@ namespace CrossNull.Logic.Services
         {
             _db = gameContext;
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public GameModel Load(int id)
         {
             Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
@@ -46,7 +52,7 @@ namespace CrossNull.Logic.Services
         //TODO    SaveStep();
         public GameModel StartNew(Player playerOne, Player playerTwo)
         {
-
+            _gameProg = new GameModel();
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
             _gameProg.PlayerTwo = playerTwo;
@@ -68,9 +74,25 @@ namespace CrossNull.Logic.Services
 
         private void SaveStep(GameModel _gameProg)
         {
-            _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
-            _db.Games.Add(_gameStateDb);
-            _db.SaveChanges();  // When exiting the method, will I lose data ?
+            if (_gameProg.Id <= 0)
+            {
+                _gameStateDb = new GameStateDb();
+                _db.Games.Add(_gameStateDb);
+                _db.SaveChanges();
+                _gameProg.Id = _gameStateDb.Id;
+                _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
+                _db.SaveChanges();
+                return;
+            }
+
+            var model = _db.Games.Find(_gameProg.Id);
+            if (model == null)
+            {
+                throw new ArgumentException("Id doesn't exist.");
+            }
+
+            model.Game = JsonConvert.SerializeObject(_gameProg);
+            _db.SaveChanges();
 
         }
     }
