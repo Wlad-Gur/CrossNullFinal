@@ -22,22 +22,22 @@ namespace CrossNull.Logic.Services
         }
 
         /// <summary>
-        ///
+        /// Loads a batch of games with the corresponding Id
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id"> Id of the required game </param>
+        /// <returns> Returns the desired game </returns>
         public GameModel Load(int id)
         {
-            Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
-            var modelGame = _db.Games.ToList();
-            foreach (var item in modelGame)
-            {
-                var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
-                gamesDict.Add(item.Id, game);
-            }
-            return gamesDict.ElementAtOrDefault(id).Value;
-        }
+            if (id < 0) { throw new ArgumentException("Id uncorrect"); }
 
+            var modelGame = _db.Games.ToList().ElementAtOrDefault(id);
+            if (modelGame == null) throw new NullReferenceException("Id uncorrect");
+            return JsonConvert.DeserializeObject<GameModel>(modelGame.Game);
+        }
+        /// <summary>
+        /// Method loads a collection of all played games from the database
+        /// </summary>
+        /// <returns>Dictionary with ID and list of games</returns>
         public Dictionary<int, GameModel> LoadAll()
         {
             Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
@@ -49,7 +49,12 @@ namespace CrossNull.Logic.Services
             }
             return gamesDict;
         }
-        //TODO    SaveStep();
+        /// <summary>
+        /// Start new game
+        /// </summary>
+        /// <param name="playerOne"> Nickname first player</param>
+        /// <param name="playerTwo"> Nickname second player</param>
+        /// <returns>Returns model of game</returns>
         public GameModel StartNew(Player playerOne, Player playerTwo)
         {
             _gameProg = new GameModel();
@@ -65,7 +70,11 @@ namespace CrossNull.Logic.Services
             //fieldNoFull = e.Win;
             //_gameProg = new Game();
         }
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="gameModels"></param>
+        /// <returns></returns>
         public GameModel Step(GameModel gameModels)
         {
 
@@ -76,15 +85,22 @@ namespace CrossNull.Logic.Services
         {
             if (_gameProg.Id <= 0)
             {
-                _gameStateDb = new GameStateDb();
-                _db.Games.Add(_gameStateDb);
-                _db.SaveChanges();
-                _gameProg.Id = _gameStateDb.Id;
-                _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
-                _db.SaveChanges();
+                SaveFirstStep(_gameProg);
                 return;
             }
-
+            SaveOrdinaryStep(_gameProg);
+        }
+        private void SaveFirstStep(GameModel _gameProg)
+        {
+            _gameStateDb = new GameStateDb();
+            _db.Games.Add(_gameStateDb);
+            _db.SaveChanges();
+            _gameProg.Id = _gameStateDb.Id;
+            _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
+            _db.SaveChanges();
+        }
+        private void SaveOrdinaryStep(GameModel _gameProg)
+        {
             var model = _db.Games.Find(_gameProg.Id);
             if (model == null)
             {
@@ -93,7 +109,6 @@ namespace CrossNull.Logic.Services
 
             model.Game = JsonConvert.SerializeObject(_gameProg);
             _db.SaveChanges();
-
         }
     }
 }
