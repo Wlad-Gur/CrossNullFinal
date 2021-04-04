@@ -59,17 +59,25 @@ namespace CrossNull.Logic.Services
         /// Method loads a collection of all played games from the database
         /// </summary>
         /// <returns>Dictionary with ID and list of games</returns>
-        public Dictionary<int, GameModel> LoadAll()
+        public Result<Dictionary<int, GameModel>> LoadAll()
         {
-            Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
-            //TODO at home подумать как оптимизировать код с помощью LINQ Select , toDictionary
-            var modelGame = _db.Games.ToList();
-            foreach (var item in modelGame)
+            try
             {
-                var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
-                gamesDict.Add(item.Id, game);
+                Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
+                //TODO at home подумать как оптимизировать код с помощью LINQ Select , toDictionary
+                var modelGame = _db.Games.ToList();
+                foreach (var item in modelGame)
+                {
+                    var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
+                    gamesDict.Add(item.Id, game);
+                }
+                return gamesDict;
             }
-            return gamesDict;
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
         /// <summary>
         /// Start new game
@@ -77,14 +85,23 @@ namespace CrossNull.Logic.Services
         /// <param name="playerOne"> Nickname first player</param>
         /// <param name="playerTwo"> Nickname second player</param>
         /// <returns>Returns model of game</returns>
-        public GameModel StartNew(Player playerOne, Player playerTwo)
+        public Result<GameModel> StartNew(Player playerOne, Player playerTwo)
         {
+            if (playerOne == null)
+            {
+                return Result.Failure<GameModel>("Incorrect name first player");
+            }
+            if (playerTwo == null)
+            {
+                return Result.Failure<GameModel>("Incorrect name second player");
+            }
             _gameProg = new GameModel();
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
             _gameProg.PlayerTwo = playerTwo;
-            SaveStep(_gameProg);
-            return _gameProg;
+            Result.ErrorMessagesSeparator = SaveStep(_gameProg);
+
+            return Result.SuccessIf( _gameProg) ;
         }
 
         private void Game_OnFieldFull(object sender, FieldFullEventArgs e)
@@ -97,39 +114,63 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="gameModels"></param>
         /// <returns></returns>
-        public GameModel Step(GameModel gameModels)
+        public Result<GameModel> Step(GameModel gameModels)
         {
 
             throw new NotImplementedException();
         }
 
-        private void SaveStep(GameModel _gameProg)
+        private Result SaveStep(GameModel _gameProg)
         {
             if (_gameProg.Id <= 0)
             {
-                SaveFirstStep(_gameProg);
-                return;
+                return Result.SuccessIf( SaveFirstStep(_gameProg), "");
+
             }
-            SaveOrdinaryStep(_gameProg);
+            return Result.Success(SaveOrdinaryStep(_gameProg));
         }
-        private void SaveFirstStep(GameModel _gameProg)
+        private Result SaveFirstStep(GameModel _gameProg)
         {
-            _gameStateDb = new GameStateDb();
-            _db.Games.Add(_gameStateDb);
-            _db.SaveChanges();
-            _gameProg.Id = _gameStateDb.Id;
-            _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
-            _db.SaveChanges();
-        }
-        private void SaveOrdinaryStep(GameModel _gameProg)
-        {
-            var model = _db.Games.Find(_gameProg.Id);
-            if (model == null)
+            try
             {
-                throw new ArgumentException("Id doesn't exist.");
+                _gameStateDb = new GameStateDb();
+                _db.Games.Add(_gameStateDb);
+                _db.SaveChanges();
+                _gameProg.Id = _gameStateDb.Id;
+                _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
+                _db.SaveChanges();
             }
-            model.Game = JsonConvert.SerializeObject(_gameProg);
-            _db.SaveChanges();
+            catch (DBConcurrencyException)
+            {
+                return Result.Failure("Two or more users try to change a record");
+            }
+            catch (DataException)
+            {
+                return Result.Failure("Connection doesn't fail");
+            }
+            return Result.Success();
+        }
+        private Result SaveOrdinaryStep(GameModel _gameProg)
+        {
+            try
+            {
+                var model = _db.Games.Find(_gameProg.Id);
+                if (model == null)
+                {
+                    throw new ArgumentException("Id doesn't exist.");
+                }
+                model.Game = JsonConvert.SerializeObject(_gameProg);
+                _db.SaveChanges();
+            }
+            catch (DBConcurrencyException)
+            {
+                return Result.Failure("Two or more users try to change a record");
+            }
+            catch (DataException)
+            {
+                return Result.Failure("Connection doesn't fail");
+            }
+            return Result.Success();
         }
     }
 }
