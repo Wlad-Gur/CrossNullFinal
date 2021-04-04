@@ -14,6 +14,7 @@ namespace CrossNull.Logic
         {
             Bind<GameContext>().ToSelf();
             Bind<IStatisticService>().To<StatisticService>();
+            Bind<IGameService>().To<GameService>();
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿using CrossNull.Logic.Models;
 using CrossNull.Models;
+using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 
 namespace CrossNull.Logic.Services
 {
-    interface IGameService
+    public interface IGameService
     {
         GameModel StartNew(Player playerOne, Player playerTwo);
-        GameModel Load(int id);
+        Result<GameModel> Load(int id);
         GameModel Step(GameModel gameModels);
         Dictionary<int, GameModel> LoadAll();
     }

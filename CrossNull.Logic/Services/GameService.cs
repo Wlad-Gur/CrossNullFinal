@@ -2,9 +2,11 @@
 using CrossNull.Domain;
 using CrossNull.Logic.Models;
 using CrossNull.Models;
+using CSharpFunctionalExtensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,14 +28,33 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="id"> Id of the required game </param>
         /// <returns> Returns the desired game </returns>
-        public GameModel Load(int id)
+        public Result<GameModel> Load(int id)
         {
-            if (id < 0) { throw new ArgumentException("Id uncorrect"); }
+            if (id <= 0)
+            {
+                var r = Result.Failure<GameModel>("Id is incorrect. Id can't be less or equal 0.");
 
-            var modelGame = _db.Games.ToList().ElementAtOrDefault(id);
-            if (modelGame == null) throw new NullReferenceException("Id uncorrect");
-            return JsonConvert.DeserializeObject<GameModel>(modelGame.Game);
+                return r;
+            }
+            try
+            {
+                var modelGame = _db.Games.SingleOrDefault(s => s.Id == id);
+                if (modelGame == null)
+                {
+                    return Result.Success<GameModel>(null);
+                }
+                return JsonConvert.DeserializeObject<GameModel>(modelGame.Game);
+            }
+            catch (DBConcurrencyException)
+            {
+                return Result.Failure<GameModel>("Two or more users try to change a record");
+            }
+            catch (DataException)
+            {
+                return Result.Failure<GameModel>("Connection doesn't fail");
+            }
         }
+
         /// <summary>
         /// Method loads a collection of all played games from the database
         /// </summary>
@@ -41,6 +62,7 @@ namespace CrossNull.Logic.Services
         public Dictionary<int, GameModel> LoadAll()
         {
             Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
+            //TODO at home подумать как оптимизировать код с помощью LINQ Select , toDictionary
             var modelGame = _db.Games.ToList();
             foreach (var item in modelGame)
             {
@@ -106,7 +128,6 @@ namespace CrossNull.Logic.Services
             {
                 throw new ArgumentException("Id doesn't exist.");
             }
-
             model.Game = JsonConvert.SerializeObject(_gameProg);
             _db.SaveChanges();
         }
