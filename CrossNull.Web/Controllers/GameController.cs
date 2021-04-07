@@ -1,4 +1,5 @@
 ﻿using CrossNull.Logic.Services;
+using CrossNull.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,6 @@ namespace CrossNull.Web.Controllers
         {
             this._gameSevice = gameSevice;
         }
-
         public ActionResult LoadGame(int id)
         {
             var result = _gameSevice.Load(id);
@@ -29,6 +29,21 @@ namespace CrossNull.Web.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+        // POST
+        [HttpPost]
+        public ActionResult NewGame(string nameOne, string nameTwo)
+        {
+            Player playerOne = new Player(PlayerTypes.X,nameOne);
+            Player playerTwo = new Player(PlayerTypes.O, nameTwo);
+            if (playerOne == null || playerTwo == null)
+            {
+                return RedirectToAction("Index");
+            }
+            var result = _gameSevice.StartNew(playerOne, playerTwo);
+            string playerActiveName = result.Value.PlayerActive.Name;
+            ViewBag.Message = playerActiveName;
+            return View(result);
         }
     }
 }

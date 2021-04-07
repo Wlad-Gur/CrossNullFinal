@@ -61,23 +61,28 @@ namespace CrossNull.Logic.Services
         /// <returns>Dictionary with ID and list of games</returns>
         public Result<Dictionary<int, GameModel>> LoadAll()
         {
+            Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
             try
             {
-                Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
+
                 //TODO at home подумать как оптимизировать код с помощью LINQ Select , toDictionary
                 var modelGame = _db.Games.ToList();
                 foreach (var item in modelGame)
                 {
                     var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
+                    if (game == null)
+                    {
+                        continue;
+                    }
                     gamesDict.Add(item.Id, game);
                 }
                 return gamesDict;
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is DBConcurrencyException || ex is DataException)
             {
-
-                throw;
+                return Result.Failure<Dictionary<int, GameModel>>("Can't connect to database");
             }
+
         }
         /// <summary>
         /// Start new game
@@ -99,9 +104,12 @@ namespace CrossNull.Logic.Services
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
             _gameProg.PlayerTwo = playerTwo;
-            Result.ErrorMessagesSeparator = SaveStep(_gameProg);
-
-            return Result.SuccessIf( _gameProg) ;
+            Result result = SaveStep(_gameProg);
+            if (result.IsSuccess)
+            {
+                return Result.Success<GameModel>(_gameProg);
+            }
+            return Result.Failure<GameModel>(result.Error);
         }
 
         private void Game_OnFieldFull(object sender, FieldFullEventArgs e)
@@ -124,7 +132,7 @@ namespace CrossNull.Logic.Services
         {
             if (_gameProg.Id <= 0)
             {
-                return Result.SuccessIf( SaveFirstStep(_gameProg), "");
+                return SaveFirstStep(_gameProg);
 
             }
             return Result.Success(SaveOrdinaryStep(_gameProg));

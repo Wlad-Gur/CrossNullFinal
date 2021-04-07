@@ -9,7 +9,7 @@ namespace CrossNull.Web.Controllers
 {
     public class HomeController : Controller
     {
-        
+
         public ActionResult NewGame()
         {
             ViewBag.Message = "Start new game";

@@ -9,6 +9,7 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
 using CrossNull.Models;
+using CrossNull.Domain;
 
 namespace ServiceTest
 {
@@ -33,21 +34,17 @@ namespace ServiceTest
             //Arrange
             var mockDbContext = new DbContextMock<GameContext>("222");
             var mockDbSet = mockDbContext.CreateDbSetMock(c => c.Games, _gameStateDb);
-            GameModel gameModel = new GameModel()
-            {
-                Id = 3,
-                PlayerOne =
-                new CrossNull.Models.Player(CrossNull.Models.PlayerTypes.X, "One"),
-                PlayerTwo = new Player(CrossNull.Models.PlayerTypes.O, "Two"),
-                PlayerActive = new Player(CrossNull.Models.PlayerTypes.X, "One"),
-                State =
-            };
+            Player playerOne =
+            new CrossNull.Models.Player(CrossNull.Models.PlayerTypes.X, "One");
+            Player playerTwo = new Player(CrossNull.Models.PlayerTypes.O, "Two");
 
             //Act
             var gameServ = new GameService(mockDbContext.Object);
-            var actual =
+            var actual = gameServ.StartNew(playerOne, playerTwo);
 
             //Assert
+            Assert.IsTrue(mockDbContext.Object.Games.Count() == 3);
+            Assert.IsTrue(actual.IsSuccess);
         }
         [TestMethod]
         public void TestStatisticService()
