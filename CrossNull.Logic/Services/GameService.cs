@@ -64,19 +64,8 @@ namespace CrossNull.Logic.Services
             Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
             try
             {
-
-                //TODO at home подумать как оптимизировать код с помощью LINQ Select , toDictionary
-                var modelGame = _db.Games.ToList();
-                foreach (var item in modelGame)
-                {
-                    var game = JsonConvert.DeserializeObject<GameModel>(item.Game);
-                    if (game == null)
-                    {
-                        continue;
-                    }
-                    gamesDict.Add(item.Id, game);
-                }
-                return gamesDict;
+                return _db.Games.Select(s => JsonConvert.DeserializeObject<GameModel>(s.Game)).
+                     ToDictionary(d => d.Id);
             }
             catch (Exception ex) when (ex is DBConcurrencyException || ex is DataException)
             {

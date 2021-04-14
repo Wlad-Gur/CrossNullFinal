@@ -1,5 +1,6 @@
 ﻿using CrossNull.Logic.Services;
 using CrossNull.Models;
+using CrossNull.Web.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,20 +31,35 @@ namespace CrossNull.Web.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public ActionResult NewGame()
+        {
+            ViewBag.Message = "My best form works";
+            return View("Init", new InitViewModel() { NameOne = "1111111", NameTwo = "222222"});
+        }
+
         // POST
         [HttpPost]
-        public ActionResult NewGame(string nameOne, string nameTwo)
+        public ActionResult NewGame(InitViewModel initViewModel)
         {
-            Player playerOne = new Player(PlayerTypes.X,nameOne);
-            Player playerTwo = new Player(PlayerTypes.O, nameTwo);
-            if (playerOne == null || playerTwo == null)
+            if (initViewModel == null)
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("NewGame");
             }
+            Player playerOne = new Player(PlayerTypes.X, initViewModel.NameOne);
+            Player playerTwo = new Player(PlayerTypes.O, initViewModel.NameTwo);
+
             var result = _gameSevice.StartNew(playerOne, playerTwo);
-            string playerActiveName = result.Value.PlayerActive.Name;
+
+            string playerActiveName = result.Value.PlayerActive.Name.ToString();
             ViewBag.Message = playerActiveName;
             return View(result);
+        }
+
+        [HttpGet]
+        public ActionResult Step(int gameId, int x, int y)
+        {
+            return View("NewGame");
         }
     }
 }

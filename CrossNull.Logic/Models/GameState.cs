@@ -8,7 +8,7 @@ namespace CrossNull.Domain
     {
         public IEnumerable<Cell> Cells { get; set; }
 
-        public GameState()  //This constructor is nessesary for serialization?
+        public GameState() : this(null)   //This constructor is nessesary for serialization?
         {
 
         }

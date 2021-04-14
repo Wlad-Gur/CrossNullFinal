@@ -1,59 +1,36 @@
 ﻿@using CrossNull.Logic.Models;
 @using CSharpFunctionalExtensions;
-@model Result<GameModel>;
-
+@model Result<GameModel>
 @{
     ViewBag.Title = "NewGame";
 }
 
-<h2>NewGame</h2>
-<form action="/" method="post" autocomplete="off">
-    <fieldset>
-        <legend>Input name of players :</legend>
-        <p>
-            <label for="login">Player One name:</label>
-            <input type="text" name="login" id="login" />
-            <label for="password">Password player One:</label>
-            <input type="password" name="password" id="password" /><br>
-        </p>
-        <p>
-            <label for="login">Player Two name:</label>
-            <input type="text" name="login" id="login" />
-            <label for="password">Password player Two:</label>
-            <input type="password" name="password" id="password" /><br>
-        </p>
-        <p>
-            <input type="submit" formmethod="post" autocomplete="off" value="Input" color="Red">
-            <button type="reset">Cancel</button>
-        </p>
-    </fieldset>
-    <h1>New Game</h1>
-    <h2>Your step @ViewBag.Message</h2>
-    <style>
-        td {
-            width: 60px;
-            height: 60px;
-            border: solid 2px silver;
-            text-align: center;
-        }
-    </style>
 
-    <table>
-        <tr>
-            <td>7</td>
-            <td>8</td>
-            <td>9</td>
-        </tr>
-        <tr>
-            <td style="background-color:red;">4</td>
-            <td style="background-color:red;">5</td>
-            <td style="background-color:red;">6</td>
+<h1>New Game</h1>
+<h2>Your step @Model.Value.PlayerActive.Name</h2>
+<style>
+    td {
+        width: 200px;
+        height: 200px;
+        border: solid 2px silver;
+        text-align: center;
+    }
+</style>
 
-        </tr>
+<table>
+    @for (int i = 0; i < 3; i++)
+    {
         <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
+            @for (int j = 0; j < 3; j++)
+            {
+                //TODO трансформацию данных перенисти внутрь контроллера, 
+                //сделать модель представления с которой тут можно работать.
+                <td>
+                    @*@Model.Value.State.Cells.Single(s => s.X == i && s.Y == j).ToString()*@
+                </td>
+            }
         </tr>
-    </table>
-</form>
+    }
+</table>
+
+

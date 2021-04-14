@@ -13,12 +13,17 @@ namespace CrossNull.Models
     }
     public class Player
     {
+        public Player()
+        {
+
+        }
+
         public Player(PlayerTypes playerType, string name)
         {
             PlayerType = playerType;
             Name = name;
         }
-        public string Name { get; }
+        public string Name { get; set; }
         public PlayerTypes PlayerType { get; }
         public override bool Equals(object obj)
         {
