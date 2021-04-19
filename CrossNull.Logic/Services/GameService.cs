@@ -22,7 +22,24 @@ namespace CrossNull.Logic.Services
         {
             _db = gameContext;
         }
+        private enum GameSituation
+        {
+            PlayerWins,
+            EndOfCells,
+            GameContinue,
+            CellIsExist
+        }
+        private class GameResult
+        {
+            public GameResult(GameSituation situation, GameModel model)
+            {
+                Situation = situation;
+                Model = model;
+            }
+            public GameSituation Situation { get; private set; }
+            public GameModel Model { get; private set; }
 
+        }
         /// <summary>
         /// Loads a batch of games with the corresponding Id
         /// </summary>
@@ -111,11 +128,70 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="gameModels"></param>
         /// <returns></returns>
-        public Result<GameModel> Step(GameModel gameModels)
+        public Result<GameModel> Step(GameModel gameModels, int colum, int line)
         {
+            //TODO интегрировать логику хода из консоли и сдедать проверки
 
-            throw new NotImplementedException();
+            if (colum > 0 || colum < 3 || line > 0 || line < 3 || gameModels != null)
+            {
+                if (gameModels.State.Cells.Any(s => s.X == colum && s.Y == line))
+                {
+                    return;
+                }
+                Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
+                gameModels.State.Cells.ToList().Add(cell);
+
+                return;
+            }
+
+
         }
+
+        private GameResult AddCell(Cell cell, GameModel gameModel)
+        {
+            var cells = gameModel.State.Cells.ToList();
+            if (cells.Any(a => a.X == cell.X && a.Y == cell.Y))
+            {
+                return new GameResult(GameSituation.CellIsExist, gameModel);
+            }
+            cells.Add(cell);
+            gameModel.State.Cells = cells;
+            //TODO заменить на явное условие
+
+            if (!(_gameProg.State.Cells.Count() > 3)) return new GameResult(GameSituation.GameContinue, gameModel);
+
+            var row = gameModel.State.Cells.Where(w => w.X == cell.X);
+            if (row.Count() == 3 && row.All(a => a.State == cell.State))
+            {
+                return new GameResult(GameSituation.PlayerWins, gameModel);
+            }
+
+            var column = gameModel.State.Cells.Where(w => w.Y == cell.Y);
+            if (column.Count() == 3 && column.All(a => a.State == cell.State))
+            {
+                return new GameResult(GameSituation.PlayerWins, gameModel);
+            }
+
+            var diagonal = gameModel.State.Cells.Where(w => w.X == w.Y);
+            if (diagonal.Count() == 3 && diagonal.All(a => a.State == cell.State))
+            {
+                return new GameResult(GameSituation.PlayerWins, gameModel);
+            }
+
+            var diagonalNext = gameModel.State.Cells.Where(w => w.X == (2 - w.Y));
+            if (diagonalNext.Count() == 3 && diagonalNext.All(a => a.State == cell.State))
+            {
+                return new GameResult(GameSituation.PlayerWins, gameModel);
+            }
+
+            if (gameModel.State.Cells.Count() == 9)
+            {
+                return new GameResult(GameSituation.EndOfCells, gameModel);
+            }
+            return new GameResult(GameSituation.GameContinue, gameModel);
+        }
+
+        private bool CanContinue() => (_gameProg.State.Cells.Count() > 3);
 
         private Result SaveStep(GameModel _gameProg)
         {

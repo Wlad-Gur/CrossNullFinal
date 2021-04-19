@@ -23,10 +23,19 @@
         <tr>
             @for (int j = 0; j < 3; j++)
             {
-                //TODO трансформацию данных перенисти внутрь контроллера, 
-                //сделать модель представления с которой тут можно работать.
+                //TODO избавиться от ViewBag
                 <td>
-                    @*@Model.Value.State.Cells.Single(s => s.X == i && s.Y == j).ToString()*@
+                    @* @ViewBag.VS[i, j]*@
+                    @* @Html.Action("/localhost?key=value&key2=value2&temp=value3")*@
+                    @* ("/Game/Step?gameId=123&x=i&y=j") *@
+                    @if (ViewBag.VS[i, j] != "?")
+                    {
+                        @ViewBag.VS[i, j]
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Cell this?", "Step", "Game", new { gameId = Model.Value.Id, x = i, y = j }, null)
+                    }
                 </td>
             }
         </tr>

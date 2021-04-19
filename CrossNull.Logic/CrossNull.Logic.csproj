@@ -63,7 +63,7 @@
     <Compile Include="LogicModule.cs" />
     <Compile Include="Models\Cell.cs" />
     <Compile Include="Models\CellStates.cs" />
-    <Compile Include="Events\FieldFullEventArgs.cs" />
+    <Compile Include="Models\FieldFullEventArgs.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Events\GameEventArgs.cs" />
     <Compile Include="Models\GameFild.cs" />

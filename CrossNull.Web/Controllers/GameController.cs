@@ -1,6 +1,8 @@
-﻿using CrossNull.Logic.Services;
+﻿using CrossNull.Logic.Models;
+using CrossNull.Logic.Services;
 using CrossNull.Models;
 using CrossNull.Web.Model;
+using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +37,7 @@ namespace CrossNull.Web.Controllers
         public ActionResult NewGame()
         {
             ViewBag.Message = "My best form works";
-            return View("Init", new InitViewModel() { NameOne = "1111111", NameTwo = "222222"});
+            return View("Init", new InitViewModel() { NameOne = "1111111", NameTwo = "222222" });
         }
 
         // POST
@@ -51,15 +53,47 @@ namespace CrossNull.Web.Controllers
 
             var result = _gameSevice.StartNew(playerOne, playerTwo);
 
-            string playerActiveName = result.Value.PlayerActive.Name.ToString();
-            ViewBag.Message = playerActiveName;
+            string[,] vs = new string[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (result.Value.State.Cells.SingleOrDefault(f => f.X == i && f.Y == j) == null)
+                    {
+                        vs[i, j] = "?";
+                    }
+                    else
+                    {
+                        vs[i, j] = result.Value.State.Cells.Single(f => f.X == i && f.Y == j).State.ToString();
+                    }
+                }
+            }
+            vs[1, 1] = "X";
+            ViewBag.VS = vs;
+
             return View(result);
         }
 
         [HttpGet]
         public ActionResult Step(int gameId, int x, int y)
         {
-            return View("NewGame");
+            if (gameId < 1)
+            {
+                return View("Init");
+            }
+            Result<GameModel> gameAfter = _gameSevice.Load(gameId);
+            if (x < 0 || x > 2 || y < 0 || y > 2)
+            {
+                return gameAfter.IsSuccess ? View("NewGame", gameAfter) : View("Init");
+            }
+
+            if (gameAfter.IsSuccess)
+            {
+                gameAfter = _gameSevice.Step(gameAfter.Value, x, y);
+                return View("NewGame", gameAfter);
+            }
+
+            return View("Init");
         }
     }
 }
