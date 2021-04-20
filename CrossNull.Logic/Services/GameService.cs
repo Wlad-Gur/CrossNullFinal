@@ -130,24 +130,18 @@ namespace CrossNull.Logic.Services
         /// <returns></returns>
         public Result<GameModel> Step(GameModel gameModels, int colum, int line)
         {
+            GameResult gameResult = new GameResult(GameSituation.GameContinue, _gameProg);
+            Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
             //TODO интегрировать логику хода из консоли и сдедать проверки
-
-            if (colum > 0 || colum < 3 || line > 0 || line < 3 || gameModels != null)
+            if (colum < 0 || colum > 3 || line < 0 || line > 3 || gameModels == null)
             {
-                if (gameModels.State.Cells.Any(s => s.X == colum && s.Y == line))
-                {
-                    return;
-                }
-                Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
-                gameModels.State.Cells.ToList().Add(cell);
-
-                return;
+                return Result.Failure<GameModel>("Incorrect data");
             }
 
-
+            return Result.Success<GameModel>(_gameProg = GameService.AddCell(cell, gameModels).Model);
         }
 
-        private GameResult AddCell(Cell cell, GameModel gameModel)
+        private static GameResult AddCell(Cell cell, GameModel gameModel)
         {
             var cells = gameModel.State.Cells.ToList();
             if (cells.Any(a => a.X == cell.X && a.Y == cell.Y))
@@ -156,7 +150,6 @@ namespace CrossNull.Logic.Services
             }
             cells.Add(cell);
             gameModel.State.Cells = cells;
-            //TODO заменить на явное условие
 
             if (!(_gameProg.State.Cells.Count() > 3)) return new GameResult(GameSituation.GameContinue, gameModel);
 
