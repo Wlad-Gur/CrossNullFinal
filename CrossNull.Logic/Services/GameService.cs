@@ -130,18 +130,30 @@ namespace CrossNull.Logic.Services
         /// <returns></returns>
         public Result<GameModel> Step(GameModel gameModels, int colum, int line)
         {
-            GameResult gameResult = new GameResult(GameSituation.GameContinue, _gameProg);
             Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
             //TODO интегрировать логику хода из консоли и сдедать проверки
             if (colum < 0 || colum > 3 || line < 0 || line > 3 || gameModels == null)
             {
                 return Result.Failure<GameModel>("Incorrect data");
             }
-
-            return Result.Success<GameModel>(_gameProg = GameService.AddCell(cell, gameModels).Model);
+            GameResult gameResult = AddCell(cell, gameModels);
+            switch (gameResult.Situation)
+            {
+                case GameSituation.CellIsExist:
+                    return Result.Failure<GameModel>("Cell is busy");
+                case GameSituation.EndOfCells:
+                    return Result.Success<GameModel>(gameResult.Model);
+                case GameSituation.GameContinue:
+                    return Result.Success<GameModel>(gameResult.Model);
+                case GameSituation.PlayerWins:
+                    return Result.Success<GameModel>(gameResult.Model);
+                default:
+                    break;
+            }
+            return Result.Success<GameModel>(_gameProg = AddCell(cell, gameModels).Model);
         }
 
-        private static GameResult AddCell(Cell cell, GameModel gameModel)
+        private GameResult AddCell(Cell cell, GameModel gameModel)
         {
             var cells = gameModel.State.Cells.ToList();
             if (cells.Any(a => a.X == cell.X && a.Y == cell.Y))
@@ -151,7 +163,8 @@ namespace CrossNull.Logic.Services
             cells.Add(cell);
             gameModel.State.Cells = cells;
 
-            if (!(_gameProg.State.Cells.Count() > 3)) return new GameResult(GameSituation.GameContinue, gameModel);
+            if (!(_gameProg.State.Cells.Count() > 3))
+                return new GameResult(GameSituation.GameContinue, gameModel);
 
             var row = gameModel.State.Cells.Where(w => w.X == cell.X);
             if (row.Count() == 3 && row.All(a => a.State == cell.State))
@@ -183,8 +196,6 @@ namespace CrossNull.Logic.Services
             }
             return new GameResult(GameSituation.GameContinue, gameModel);
         }
-
-        private bool CanContinue() => (_gameProg.State.Cells.Count() > 3);
 
         private Result SaveStep(GameModel _gameProg)
         {
