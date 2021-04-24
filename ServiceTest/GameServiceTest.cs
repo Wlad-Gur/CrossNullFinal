@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using CrossNull.Data;
 using CrossNull.Domain;
 using CrossNull.Logic.Models;
+using CrossNull.Logic.Services;
 using CrossNull.Models;
+using EntityFrameworkMock;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ServiceTest
@@ -20,11 +23,17 @@ namespace ServiceTest
             PlayerOne = new Player(PlayerTypes.X, "One"),
             PlayerTwo = new Player(PlayerTypes.O, "Two"),
             PlayerActive = new Player(PlayerTypes.X, "One"),
-            gameState,
+
         };
         [TestMethod]
-        public void TestMethod1()
+        public void StepTestReturnGameContinue()
         {
+            //Arrange
+            var mockDBContext = new DbContextMock<GameContext>("wwwgame");
+            GameService gameService = new GameService(mockDBContext.Object);
+            //Act
+            var expected = gameService.Step(_gameModel, 1, 1).;
+
         }
     }
 }

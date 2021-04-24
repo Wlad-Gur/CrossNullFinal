@@ -22,24 +22,6 @@ namespace CrossNull.Logic.Services
         {
             _db = gameContext;
         }
-        private enum GameSituation
-        {
-            PlayerWins,
-            EndOfCells,
-            GameContinue,
-            CellIsExist
-        }
-        private class GameResult
-        {
-            public GameResult(GameSituation situation, GameModel model)
-            {
-                Situation = situation;
-                Model = model;
-            }
-            public GameSituation Situation { get; private set; }
-            public GameModel Model { get; private set; }
-
-        }
         /// <summary>
         /// Loads a batch of games with the corresponding Id
         /// </summary>
@@ -128,29 +110,19 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="gameModels"></param>
         /// <returns></returns>
-        public Result<GameModel> Step(GameModel gameModels, int colum, int line)
+        public Result<GameResult> Step(GameModel gameModels, int colum, int line)
         {
             Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
             //TODO интегрировать логику хода из консоли и сдедать проверки
             if (colum < 0 || colum > 3 || line < 0 || line > 3 || gameModels == null)
             {
-                return Result.Failure<GameModel>("Incorrect data");
+                return Result.Failure<GameResult>("Incorrect data");
             }
+
             GameResult gameResult = AddCell(cell, gameModels);
-            switch (gameResult.Situation)
-            {
-                case GameSituation.CellIsExist:
-                    return Result.Failure<GameModel>("Cell is busy");
-                case GameSituation.EndOfCells:
-                    return Result.Success<GameModel>(gameResult.Model);
-                case GameSituation.GameContinue:
-                    return Result.Success<GameModel>(gameResult.Model);
-                case GameSituation.PlayerWins:
-                    return Result.Success<GameModel>(gameResult.Model);
-                default:
-                    break;
-            }
-            return Result.Success<GameModel>(_gameProg = AddCell(cell, gameModels).Model);
+            SaveStep(gameResult.Model);
+
+            return gameResult;
         }
 
         private GameResult AddCell(Cell cell, GameModel gameModel)

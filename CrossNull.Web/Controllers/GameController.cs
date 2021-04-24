@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static CrossNull.Logic.Services.GameService;
 
 namespace CrossNull.Web.Controllers
 {
@@ -89,8 +90,41 @@ namespace CrossNull.Web.Controllers
 
             if (gameAfter.IsSuccess)
             {
-                gameAfter = _gameSevice.Step(gameAfter.Value, x, y);
-                return View("NewGame", gameAfter);
+                var stepResult = _gameSevice.Step(gameAfter.Value, x, y);
+                if (stepResult.IsFailure)
+                {
+                    //возвращаем тоже самое игровое поле и сообщение "Incorrect data"
+                    ViewBag.Message = "Incorrect data";
+                    return View("NewGame", gameAfter);
+                }
+
+                switch (stepResult.Value.Situation)
+                {
+
+                    case GameSituation.CellIsExist:
+                        //возвращаем тоже самое игровое поле и сообщение "Cell is busy"
+                        ViewBag.Message = "Cell is busy";
+                        return View("NewGame", gameAfter);
+
+                    case GameSituation.EndOfCells:
+                        //просто сообщение "Game Over. Nobody win."
+                        return View("NobodyWin");
+
+                    case GameSituation.GameContinue:
+                        //возвращаем обновленное игровое поле
+                        Result<GameModel> convertResult = stepResult.Value.Model;
+                        return View("NewGame", convertResult);
+
+                    case GameSituation.PlayerWins:
+                        //обновленное поле и сообщение "Player XXX Wins"
+                        Result<GameModel> convertResultn = stepResult.Value.Model;
+                        ViewBag.Message = $"Player {stepResult.Value.Model.PlayerActive.Name} Wins";
+                        return View("NewGame", convertResultn);
+                    default:
+
+                        break;
+                }
+
             }
 
             return View("Init");

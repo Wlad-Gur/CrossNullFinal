@@ -6,8 +6,13 @@
 }
 
 
-<h1>New Game</h1>
+<h1>Game</h1>
+@if (ViewBag.Message != null)
+{
+    <h2>@ViewBag.Message</h2>
+}
 <h2>Your step @Model.Value.PlayerActive.Name</h2>
+
 <style>
     td {
         width: 200px;
