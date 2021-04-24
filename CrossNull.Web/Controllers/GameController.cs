@@ -113,13 +113,48 @@ namespace CrossNull.Web.Controllers
                     case GameSituation.GameContinue:
                         //возвращаем обновленное игровое поле
                         Result<GameModel> convertResult = stepResult.Value.Model;
+                        string[,] vs = new string[3, 3];
+                        for (int i = 0; i < 3; i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                if (convertResult.Value.State.Cells.SingleOrDefault(f => f.X == i && f.Y == j) == null)
+                                {
+                                    vs[i, j] = "?";
+                                }
+                                else
+                                {
+                                    vs[i, j] = convertResult.Value.State.Cells.Single(f => f.X == i && f.Y == j).State.ToString();
+                                }
+                            }
+                        }
+                        vs[1, 1] = "X";
+                        ViewBag.VS = vs;
                         return View("NewGame", convertResult);
 
                     case GameSituation.PlayerWins:
                         //обновленное поле и сообщение "Player XXX Wins"
                         Result<GameModel> convertResultn = stepResult.Value.Model;
                         ViewBag.Message = $"Player {stepResult.Value.Model.PlayerActive.Name} Wins";
-                        return View("NewGame", convertResultn);
+                        Result<GameModel> convertResult2 = stepResult.Value.Model;
+                        string[,] vs2 = new string[3, 3];
+                        for (int i = 0; i < 3; i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                if (convertResult2.Value.State.Cells.SingleOrDefault(f => f.X == i && f.Y == j) == null)
+                                {
+                                    vs2[i, j] = "?";
+                                }
+                                else
+                                {
+                                    vs2[i, j] = convertResult2.Value.State.Cells.Single(f => f.X == i && f.Y == j).State.ToString();
+                                }
+                            }
+                        }
+                        vs2[1, 1] = "X";
+                        ViewBag.VS = vs2;
+                        return View("NewGame", convertResult2);
                     default:
 
                         break;

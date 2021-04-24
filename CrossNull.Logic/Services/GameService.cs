@@ -134,8 +134,9 @@ namespace CrossNull.Logic.Services
             }
             cells.Add(cell);
             gameModel.State.Cells = cells;
-
-            if (!(_gameProg.State.Cells.Count() > 3))
+            _gameProg = gameModel;
+            int t = _gameProg.State.Cells.Count();
+            if (_gameProg.State.Cells.Count() < 3)
                 return new GameResult(GameSituation.GameContinue, gameModel);
 
             var row = gameModel.State.Cells.Where(w => w.X == cell.X);
