@@ -1,10 +1,11 @@
 ﻿@using CrossNull.Logic.Models;
 @using CSharpFunctionalExtensions;
-@model Result<GameModel>
 @{
     ViewBag.Title = "PlayerWin";
 }
 
-<h2>PlayerWin</h2>
-<h2>ViewBag.Message</h2>
+<h1>Congratulations<span class="badge bg-success badge bg-secondary">PlayerWin</span></h1>
 
+<div class="alert alert-success" role="alert">
+    @ViewBag.Message
+</div>

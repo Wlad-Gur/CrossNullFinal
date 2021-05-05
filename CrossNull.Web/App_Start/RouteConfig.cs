@@ -12,7 +12,11 @@ namespace CrossNull.Web
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
+            routes.MapRoute(
+                name: "Init",
+                url: "Game/Init/{id}",
+                defaults: new { controller = "Game", action = "NewGame", id = UrlParameter.Optional}
+                );
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

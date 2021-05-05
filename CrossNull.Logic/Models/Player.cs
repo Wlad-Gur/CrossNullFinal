@@ -24,7 +24,7 @@ namespace CrossNull.Models
             Name = name;
         }
         public string Name { get; set; }
-        public PlayerTypes PlayerType { get; }
+        public PlayerTypes PlayerType { get; set; }
         public override bool Equals(object obj)
         {
             if (obj == null)

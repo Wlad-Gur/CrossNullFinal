@@ -158,6 +158,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\HelperForGameMode.cs" />
     <Compile Include="Model\InitViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -206,6 +207,7 @@
     <Content Include="Views\Game\Init.cshtml" />
     <Content Include="Views\Game\NobodyWin.cshtml" />
     <Content Include="Views\Game\PlayerWin.cshtml" />
+    <Content Include="Views\Game\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

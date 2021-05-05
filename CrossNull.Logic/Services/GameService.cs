@@ -120,8 +120,14 @@ namespace CrossNull.Logic.Services
             }
 
             GameResult gameResult = AddCell(cell, gameModels);
-            SaveStep(gameResult.Model);
+            if (gameResult.Situation != GameSituation.PlayerWins)
+            {
+                gameResult.Model.PlayerActive = gameResult.Model.PlayerActive.Equals(gameResult.Model.PlayerOne) ?
+                                gameResult.Model.PlayerTwo :
+                                gameResult.Model.PlayerOne;
+            }
 
+            SaveStep(gameResult.Model);
             return gameResult;
         }
 

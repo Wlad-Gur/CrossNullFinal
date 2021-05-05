@@ -1,5 +1,6 @@
 ﻿@using CrossNull.Logic.Models;
 @using CSharpFunctionalExtensions;
+@using CrossNull.Domain;
 @model Result<GameModel>
 @{
     ViewBag.Title = "NewGame";
@@ -23,26 +24,28 @@
     }
 </style>
 
+
 <table>
+
     @for (int i = 0; i < 3; i++)
     {
         <tr>
             @for (int j = 0; j < 3; j++)
             {
                 //TODO избавиться от ViewBag
-                <td>
-                    @* @ViewBag.VS[i, j]*@
-                    @* @Html.Action("/localhost?key=value&key2=value2&temp=value3")*@
-                    @* ("/Game/Step?gameId=123&x=i&y=j") *@
-                    @if (ViewBag.VS[i, j] != "?")
-                    {
-                        @ViewBag.VS[i, j]
-                    }
-                    else
-                    {
-                        @Html.ActionLink("Cell this?", "Step", "Game", new { gameId = Model.Value.Id, x = i, y = j }, null)
-                    }
-                </td>
+            <td>
+                @{
+                    Cell temp = Model.Value.State.Cells.SingleOrDefault(s => s.X == i && s.Y == j);
+                }
+                @if (temp != null)
+                {
+                    @temp.State;
+                }
+                else
+                {
+                    @Html.ActionLink("Empty", "Step", "Game", new { gameId = Model.Value.Id, x = i, y = j }, null)
+                }
+            </td>
             }
         </tr>
     }
