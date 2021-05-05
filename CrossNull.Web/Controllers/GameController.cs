@@ -81,7 +81,7 @@ namespace CrossNull.Web.Controllers
                     return View("NewGame", gameAfter);
                 }
 
-                var res = stepResult.When().AddData().ReturnView();
+                return View (stepResult.When(GameSituation.CellIsExist).AddData().ReturnView().Item1.Item2);
 
                 switch (stepResult.Value.Situation)
                 {

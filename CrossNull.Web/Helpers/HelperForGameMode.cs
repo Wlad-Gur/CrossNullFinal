@@ -15,32 +15,28 @@ namespace CrossNull.Web.Helpers
         public static int _id;
         public static string _view;
 
-        public static Result<GameResult> When(this Result<GameResult> result/*, GameSituation gameSituation*/)
+        public static (bool, Result<GameResult>) When
+            (this Result<GameResult> result, GameSituation gameSituation)
         {
-            if (result.Value.Situation == GameSituation.CellIsExist)
+            if (result.Value.Situation == gameSituation)
             {
-                _tf = true;
-                return (result);
+                return (true, result);
             }
-            return (result);
+            return (false, result);
         }
-        public  static Result<GameResult> AddData(this Result<GameResult> result)
+        public static (int, string, Result<GameResult>) AddData
+            (this (bool, Result<GameResult>) result)
         {
-            if (_tf)
+            if (result.Item1)
             {
-                _id = result.Value.Model.Id;
-                _message = "Cell is busy";
-                return (result);// new {Id = gameafter.value.id, mesage = ""}
+                return (result.Item2.Value.Model.Id, "Cell is busy", result.Item2);// new {Id = gameafter.value.id, mesage = ""}
             }
-            return (result);
+            return (result.Item2.Value.Model.Id, "", result.Item2);
         }
-        public static ( bool ts, string message, int id, string view) ReturnView(this Result<GameResult> result)
+        public static ((int, string, Result<GameResult>), string view) ReturnView
+            (this (int, string, Result<GameResult>) result)
         {
-            if (_tf)
-            {
-                _view = "Error";
-            }
-            return (_tf, _message, _id, _view);
+            return (result, "Error");
         }
     }
 
