@@ -73,15 +73,16 @@ namespace CrossNull.Web.Controllers
 
             if (gameAfter.IsSuccess)
             {
-                var stepResult = _gameSevice.Step(gameAfter.Value, x, y);
+                var stepResult = _gameSevice.StepEn(gameAfter.Value, x, y);
                 if (stepResult.IsFailure)
                 {
                     //возвращаем тоже самое игровое поле и сообщение "Incorrect data"
                     ViewBag.Message = "Incorrect data";
                     return View("NewGame", gameAfter);
                 }
-
-                return View (stepResult.When(GameSituation.CellIsExist).AddData().ReturnView().Item1.Item2);
+                stepResult.When(r => (r.Situation == GameSituation.CellIsExist)).
+                    AddData(a => ViewBag.Message = "Cell is busy").
+                    AddData(a => ViewBag.Id = gameAfter.Value.Id);
 
                 switch (stepResult.Value.Situation)
                 {

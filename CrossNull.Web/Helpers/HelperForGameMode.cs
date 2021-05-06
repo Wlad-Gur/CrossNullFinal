@@ -15,28 +15,35 @@ namespace CrossNull.Web.Helpers
         public static int _id;
         public static string _view;
 
-        public static (bool, Result<GameResult>) When
-            (this Result<GameResult> result, GameSituation gameSituation)
+        public static Result<GameResult> When
+            (this Result<GameResult> result,
+            Func<GameResult, bool> cellIsBusy)
         {
-            if (result.Value.Situation == gameSituation)
-            {
-                return (true, result);
-            }
-            return (false, result);
+            if (result.IsFailure) return result;
+            if (cellIsBusy == null) return Result.Failure<GameResult>("Condition is wrong");
+            return (cellIsBusy(result.Value)) ? result :
+             Result.Failure<GameResult>("Condition is wrong");
         }
-        public static (int, string, Result<GameResult>) AddData
-            (this (bool, Result<GameResult>) result)
+        public static Result<GameResult> AddData
+            (this Result<GameResult> result, Action<GameResult> action)
         {
-            if (result.Item1)
+            if (result.IsFailure) return result;
+            if (action == null) return Result.Failure<GameResult>("Action is wrong");
+            try
             {
-                return (result.Item2.Value.Model.Id, "Cell is busy", result.Item2);// new {Id = gameafter.value.id, mesage = ""}
+                action(result.Value);
             }
-            return (result.Item2.Value.Model.Id, "", result.Item2);
+            catch (Exception)
+            {
+                return Result.Failure<GameResult>("Exeption");
+            }
+            return result;
         }
-        public static ((int, string, Result<GameResult>), string view) ReturnView
-            (this (int, string, Result<GameResult>) result)
+        //TODO
+        public static ActionResult ReturnView
+            (this Result<GameResult> result)
         {
-            return (result, "Error");
+            return (result.Item1, result.Item2, result.Item3, "Error");
         }
     }
 

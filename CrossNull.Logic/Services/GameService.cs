@@ -110,7 +110,7 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="gameModels"></param>
         /// <returns></returns>
-        public Result<GameResult> Step(GameModel gameModels, int colum, int line)
+        public Result<GameResult> StepEn(GameModel gameModels, int colum, int line)
         {
             Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
             //TODO интегрировать логику хода из консоли и сдедать проверки

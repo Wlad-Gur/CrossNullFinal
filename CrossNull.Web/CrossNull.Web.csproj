@@ -153,6 +153,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\GameController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\SampleController.cs" />
     <Compile Include="Controllers\StatisticController.cs" />
     <Compile Include="Global.asax.cs">
@@ -208,6 +209,7 @@
     <Content Include="Views\Game\NobodyWin.cshtml" />
     <Content Include="Views\Game\PlayerWin.cshtml" />
     <Content Include="Views\Game\Error.cshtml" />
+    <Content Include="Views\Login\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
