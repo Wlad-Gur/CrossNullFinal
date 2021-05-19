@@ -10,9 +10,11 @@ namespace CrossNull.Web.Controllers
     public class StatisticController : Controller
     {
         private IStatisticService _statService;
+        
         public StatisticController(IStatisticService statisticService)
         {
             _statService = statisticService;
+ 
         }
         // GET: Statistic
 

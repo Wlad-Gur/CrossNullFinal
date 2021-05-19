@@ -10,10 +10,6 @@ namespace CrossNull.Web.Helpers
 {
     public static class HelperForGameMode
     {
-        public static bool _tf = false;
-        public static string _message;
-        public static int _id;
-        public static string _view;
 
         public static Result<GameResult> When
             (this Result<GameResult> result,
@@ -22,7 +18,7 @@ namespace CrossNull.Web.Helpers
             if (result.IsFailure) return result;
             if (cellIsBusy == null) return Result.Failure<GameResult>("Condition is wrong");
             return (cellIsBusy(result.Value)) ? result :
-             Result.Failure<GameResult>("Condition is wrong");
+             Result.Failure<GameResult>("Condition is wrong");//Cell is busy
         }
         public static Result<GameResult> AddData
             (this Result<GameResult> result, Action<GameResult> action)
@@ -40,10 +36,30 @@ namespace CrossNull.Web.Helpers
             return result;
         }
         //TODO
-        public static ActionResult ReturnView
-            (this Result<GameResult> result)
+        public static Result<ActionResult> ReturnView
+            (this Result<GameResult> result, Func<ActionResult> action)
         {
-            return (result.Item1, result.Item2, result.Item3, "Error");
+            if (action == null)
+            {
+                return Result.Failure<ActionResult>("Action is wrong");
+            }
+            if (result.IsFailure)
+            {
+                return Result.Failure<ActionResult>("Condition is wrong");
+            }
+            return action();
+        }
+        public static Result<GameResult> Or
+            (this Result<ActionResult> result)
+        {
+            if (result.IsSuccess)
+            {
+               // GameResult gameResult = new GameResult(result.Value.ExecuteResult());
+                //GameResult gameResult = new GameResult(result.OnSuccess<ActionResult, GameResult>
+                //    (r => r.ExecuteResult() );
+                return new Result<GameResult>();
+            }
+            return Result.Failure<GameResult>("Next situation");
         }
     }
 

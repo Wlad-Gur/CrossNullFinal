@@ -10,7 +10,7 @@ namespace CrossNull.Logic.Services
     {
         Result<GameModel> StartNew(Player playerOne, Player playerTwo);
         Result<GameModel> Load(int id);
-        Result<GameResult> StepEn(GameModel gameModels, int colum, int line);
+        Result<GameResult> NextTurn(GameModel gameModels, int colum, int line);
         Result<Dictionary<int, GameModel>> LoadAll();
     }
 }

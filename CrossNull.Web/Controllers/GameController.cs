@@ -16,7 +16,6 @@ namespace CrossNull.Web.Controllers
     public class GameController : Controller
     {
         private readonly IGameService _gameSevice;
-
         public GameController(IGameService gameSevice)
         {
             this._gameSevice = gameSevice;
@@ -59,64 +58,71 @@ namespace CrossNull.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Step(int gameId, int x, int y)
+        public ActionResult Step(int gameId = 0, int x = -1, int y = -1)
         {
-            if (gameId < 1)
+            Result<GameModel> currentGame = _gameSevice.Load(gameId);
+            if (currentGame.IsFailure)
             {
-                return View("Init");
+                return View("Init", new InitViewModel());
             }
-            Result<GameModel> gameAfter = _gameSevice.Load(gameId);
             if (x < 0 || x > 2 || y < 0 || y > 2)
             {
-                return gameAfter.IsSuccess ? View("NewGame", gameAfter) : View("Init");
+                return currentGame.IsSuccess ? View("NewGame", currentGame) : View("Init",
+                    new InitViewModel()
+                    {
+                        NameOne = currentGame.Value.PlayerOne.Name,
+                        NameTwo = currentGame.Value.PlayerTwo.Name
+                    });
             }
 
-            if (gameAfter.IsSuccess)
+            if (currentGame.IsSuccess)
             {
-                var stepResult = _gameSevice.StepEn(gameAfter.Value, x, y);
+                var stepResult = _gameSevice.NextTurn(currentGame.Value, x, y);
                 if (stepResult.IsFailure)
                 {
                     //возвращаем тоже самое игровое поле и сообщение "Incorrect data"
                     ViewBag.Message = "Incorrect data";
-                    return View("NewGame", gameAfter);
+                    return View("NewGame", currentGame);
                 }
-                stepResult.When(r => (r.Situation == GameSituation.CellIsExist)).
+
+                List<Result<ActionResult>> resultsList = new List<Result<ActionResult>>();
+
+                resultsList.Add(stepResult.When(r => (r.Situation == GameSituation.CellIsExist)).
+                AddData(a => ViewBag.Message = "Cell is busy").
+                AddData(a => ViewBag.Id = currentGame.Value.Id).ReturnView(() => View("Error")));
+
+                resultsList.Add(stepResult.When(r => (r.Situation == GameSituation.EndOfCells)).
+                    ReturnView(() => View("NobodyWin")));
+
+                resultsList.Add(stepResult.When(r => (r.Situation == GameSituation.PlayerWins)).
+                      AddData(a => ViewBag.Message = $"Player {stepResult.Value.Model.PlayerActive.Name} Wins").
+                      ReturnView(() => View("PlayerWin")));
+
+                Result<GameModel> convertResult = null;
+
+                resultsList.Add(stepResult.When(r => (r.Situation == GameSituation.GameContinue)).
+                        AddData(a => convertResult = stepResult.Value.Model).
+                        ReturnView(() => View("NewGame", convertResult)));
+
+                var resultOr = stepResult.When(r => (r.Situation == GameSituation.GameContinue)).
                     AddData(a => ViewBag.Message = "Cell is busy").
-                    AddData(a => ViewBag.Id = gameAfter.Value.Id);
+                AddData(a => ViewBag.Id = currentGame.Value.Id).ReturnView(() => View("NewGame", convertResult));
 
-                switch (stepResult.Value.Situation)
-                {
-
-                    case GameSituation.CellIsExist:
-                        // TODO stepResult.When(GameSituation.CellIsExist)
-                        // .AddData(new {Id = gameafter.value.id, mesage = ""})
-                        // .ReturnView("Error").Or().When(...).;
-                        //возвращаем тоже самое игровое поле и сообщение "Cell is busy"
-                        ViewBag.Message = "Cell is busy";
-                        ViewBag.Id = gameAfter.Value.Id;
-                        return View("Error");
-
-                    case GameSituation.EndOfCells:
-                        //просто сообщение "Game Over. Nobody win."
-                        return View("NobodyWin");
-
-                    case GameSituation.GameContinue:
-                        //возвращаем обновленное игровое поле
-                        Result<GameModel> convertResult = stepResult.Value.Model;
-                        return View("NewGame", convertResult);
-
-                    case GameSituation.PlayerWins:
-                        //обновленное поле и сообщение "Player XXX Wins"
-                        ViewBag.Message = $"Player {stepResult.Value.Model.PlayerActive.Name} Wins";
-                        return View("PlayerWin");
-                    default:
-
-                        break;
-                }
+                return (resultsList.SingleOrDefault(w => w.IsSuccess).IsFailure ? View("Init",
+                    new InitViewModel()
+                    {
+                        NameOne = currentGame.Value.PlayerOne.Name,
+                        NameTwo = currentGame.Value.PlayerTwo.Name
+                    }) : resultsList.SingleOrDefault(w => w.IsSuccess).Value);
 
             }
 
-            return View("Init");
+            return View("Init",
+                    new InitViewModel()
+                    {
+                        NameOne = currentGame.Value.PlayerOne.Name,
+                        NameTwo = currentGame.Value.PlayerTwo.Name
+                    });
         }
     }
 }

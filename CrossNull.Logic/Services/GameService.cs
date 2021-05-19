@@ -40,7 +40,7 @@ namespace CrossNull.Logic.Services
                 var modelGame = _db.Games.SingleOrDefault(s => s.Id == id);
                 if (modelGame == null)
                 {
-                    return Result.Success<GameModel>(null);
+                    return Result.Failure<GameModel>("Game doesn't exist with this ID.");
                 }
                 return JsonConvert.DeserializeObject<GameModel>(modelGame.Game);
             }
@@ -110,7 +110,7 @@ namespace CrossNull.Logic.Services
         /// </summary>
         /// <param name="gameModels"></param>
         /// <returns></returns>
-        public Result<GameResult> StepEn(GameModel gameModels, int colum, int line)
+        public Result<GameResult> NextTurn(GameModel gameModels, int colum, int line)
         {
             Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
             //TODO интегрировать логику хода из консоли и сдедать проверки

@@ -1,0 +1,30 @@
+﻿@model IEnumerable<KeyValuePair<int, CrossNull.Logic.Models.GameModel>>
+
+@{
+    ViewBag.Title = "PlayerResult";
+}
+
+<h2>Table of player result</h2>
+<h2>@ViewBag.Message</h2>
+<h3>@ViewBag.Fignj</h3>
+<body>
+    <div>
+        <table>
+            <tr>
+                <td><p>Id</p></td>
+                <td><p>  Name One player</p></td>
+                <td><p>  Name Two player</p></td>
+            </tr>
+
+            @foreach (var player in Model)
+            {
+                <tr>
+                    <td><p>@player.Value.Id</p></td>
+                    <td><p>  @player.Value.PlayerOne.Name</p></td>
+                    <td><p>  @player.Value.PlayerTwo.Name</p></td>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
+

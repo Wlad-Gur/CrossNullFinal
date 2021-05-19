@@ -32,7 +32,7 @@ namespace ServiceTest
             var mockDBContext = new DbContextMock<GameContext>("wwwgame");
             GameService gameService = new GameService(mockDBContext.Object);
             //Act
-            var expected = gameService.StepEn(_gameModel, 1, 1).;
+            var expected = gameService.NextTurn(_gameModel, 1, 1).;
 
         }
     }
