@@ -1,0 +1,23 @@
+﻿@using CrossNull.Web.Model
+@model RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Register</h2>
+
+<form method="post">
+    @Html.EditorForModel()
+    <input type="submit" class="btn btn-primary btn-lg d-grid gap-2 col-6 mx-auto col-lg-offset-1" value="Send" /><br /><br />
+</form>
+@*<form method="post" style="background-color:antiquewhite" class="row col-lg-push-3">
+        <label class="visually-hidden">Login:</label><br />
+        <input type="text" class="form-control" name="login" /><br /><br />
+        <label class="visually-hidden">Your e-mail:</label><br />
+        <input type="text" class="form-control" name="Email" /><br /><br />
+        <label>Password:</label><br />
+        <input type="password" class="form-control form-control-lg" name="password" /><br /><br />
+        <label>Repeat password:</label><br />
+        <input type="password" class="form-control form-control-lg" name="password" /><br /><br />
+        <input type="submit" class="btn btn-primary btn-lg d-grid gap-2 col-6 mx-auto col-lg-offset-1" value="Send" /><br /><br />
+    </form>*@

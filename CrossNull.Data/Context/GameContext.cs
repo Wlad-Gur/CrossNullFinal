@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace CrossNull.Data
 {
-    class GameContext : DbContext
+    class GameContext : IdentityDbContext
     {
         public GameContext() : this("DbConnection22")
         {
