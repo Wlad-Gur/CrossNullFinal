@@ -43,8 +43,12 @@ namespace CrossNull.Web.Controllers
                 };
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
-                //TODO добавить кастьмную ошибку в ModelState.AddError
+                ViewBag.Message = "Oops! Something went wrong!";
+                ModelState.AddModelError("Email", "Repiat to fill form again");
+                //TODO добавить кастoмную ошибку в ModelState.AddError
             }
+
+            ViewBag.Message = "Oops! Something went wrong!";
             return View(registerViewModel);
 
         }

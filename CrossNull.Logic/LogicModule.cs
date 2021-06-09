@@ -20,11 +20,10 @@ namespace CrossNull.Logic
             Bind<IGameService>().To<GameService>();
             Bind<IUserStore<IdentityUser>>().To<UserStore<IdentityUser>>().
                 WithConstructorArgument<GameContext>(new GameContext());
+            //ToMethod(ctx => new UserStore<IdentityUser>( это лучше
+            //(System.Data.Entity.DbContext)ctx.Kernel.GetService(typeof(GameContext))));//разобраться, создаем автоматом экземпляр GameContext
             Bind<UserManager<IdentityUser>>().ToSelf();
             Bind<IUserService>().To<UserService>();
-                //ToMethod(ctx => new UserStore<IdentityUser>( это лучше
-                //(System.Data.Entity.DbContext)ctx.Kernel.GetService(typeof(GameContext))));//разобраться, создаем автоматом экземпляр GameContext
-
         }
     }
 }

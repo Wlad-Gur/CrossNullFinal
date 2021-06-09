@@ -24,18 +24,32 @@ namespace CrossNull.Logic.Services
         {
             if (registerModel == null)
             {
-
+                //error
             }
-            if (_gameContext.Users.Any(a=> a.Email == registerModel.Email))
+            if (_gameContext.Users.Any(a => a.Email == registerModel.Email))
             {
                 //error
             }
-            IdentityUser identityUser = new IdentityUser() { UserName = registerModel.UserName,
-             Email = registerModel.Email};
+            IdentityUser identityUser = new IdentityUser()
+            {
+                UserName = registerModel.UserName,
+                Email = registerModel.Email
+            };
             _userManager.Create(identityUser, registerModel.Password);
-            //проверить результат операции, и сообщить успешно или нет.
-            //проверить юзера на повторение, существует ли, с пощью коптекста  и юзер менеджера
+            if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
+            {
+                //проверить результат операции, и сообщить успешно или нет.
+                return Result.Failure("User doesn't added");
+            }
+            if (_gameContext.Users.Any(a => a.UserName == registerModel.UserName))
+            {
+                //проверить юзера на повторение, существует ли, с пощью коптекста  и юзер менеджера
+                return Result.Failure("UserName is uncorrect");
+            }
             //если все хорошо дабавляем юзер,
+            _gameContext.Users.Add(identityUser);
+            _gameContext.SaveChanges();
+
             return Result.Success();//
         }
     }
