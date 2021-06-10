@@ -18,8 +18,7 @@ namespace CrossNull.Logic
             Bind<GameContext>().ToSelf();
             Bind<IStatisticService>().To<StatisticService>();
             Bind<IGameService>().To<GameService>();
-            Bind<IUserStore<IdentityUser>>().To<UserStore<IdentityUser>>().
-                WithConstructorArgument<GameContext>(new GameContext());
+            Bind<IUserStore<IdentityUser>>().ToMethod(_ => new UserStore<IdentityUser>(new GameContext()));
             //ToMethod(ctx => new UserStore<IdentityUser>( это лучше
             //(System.Data.Entity.DbContext)ctx.Kernel.GetService(typeof(GameContext))));//разобраться, создаем автоматом экземпляр GameContext
             Bind<UserManager<IdentityUser>>().ToSelf();

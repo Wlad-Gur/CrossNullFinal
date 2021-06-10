@@ -30,25 +30,24 @@ namespace CrossNull.Logic.Services
             {
                 //error
             }
-            IdentityUser identityUser = new IdentityUser()
-            {
-                UserName = registerModel.UserName,
-                Email = registerModel.Email
-            };
-            _userManager.Create(identityUser, registerModel.Password);
-            if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
-            {
-                //проверить результат операции, и сообщить успешно или нет.
-                return Result.Failure("User doesn't added");
-            }
+
             if (_gameContext.Users.Any(a => a.UserName == registerModel.UserName))
             {
                 //проверить юзера на повторение, существует ли, с пощью коптекста  и юзер менеджера
                 return Result.Failure("UserName is uncorrect");
             }
-            //если все хорошо дабавляем юзер,
-            _gameContext.Users.Add(identityUser);
-            _gameContext.SaveChanges();
+
+            IdentityUser identityUser = new IdentityUser()
+            {
+                UserName = registerModel.UserName,
+                Email = registerModel.Email
+            };
+
+            if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
+            {
+                //проверить результат операции, и сообщить успешно или нет.
+                return Result.Failure("User doesn't added");
+            }
 
             return Result.Success();//
         }

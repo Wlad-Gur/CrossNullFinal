@@ -44,7 +44,7 @@ namespace CrossNull.Web.Controllers
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
                 ViewBag.Message = "Oops! Something went wrong!";
-                ModelState.AddModelError("Email", "Repiat to fill form again");
+                ModelState.AddModelError("", "Repiat to fill form again");//уровень модели?
                 //TODO добавить кастoмную ошибку в ModelState.AddError
             }
 

@@ -23,7 +23,7 @@ namespace CrossNull.Web.Model
 
         [Required(ErrorMessage = "Field must be filled")]
         [DataType(DataType.Password)]
-        [Compare("Password")]
+        [Compare("Password", ErrorMessage ="Password and ConfirmPassword don't match")]
         [Display(Name = "Repeat password")]
         public string ConfirmPassword { get; set; }
 
