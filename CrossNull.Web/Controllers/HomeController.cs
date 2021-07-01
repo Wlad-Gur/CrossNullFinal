@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace CrossNull.Web.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
 
@@ -23,6 +24,7 @@ namespace CrossNull.Web.Controllers
 
             return View();
         }
+
         public ActionResult Index()
         {
             return View();

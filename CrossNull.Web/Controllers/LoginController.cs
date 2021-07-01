@@ -1,7 +1,10 @@
 ﻿using CrossNull.Logic.Services;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -30,15 +33,18 @@ namespace CrossNull.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Login(string login, string password)
+        public async Task<ActionResult>  Login(string login, string password)
         {
-            string authData = $"Login: {login}   Password: {password}";
-            ViewBag.Fignj = authData;
-            ViewBag.Message = "List of Games";
-            var stat = _statisticService.LoadGameStatistic().
-                Where(w => w.Value.PlayerOne.Name == login
-            || w.Value.PlayerTwo.Name == login);
-            return View("PlayerResult", stat);
+            var context = HttpContext.GetOwinContext();
+            var manager = context.Get<SignInManager<IdentityUser, string>>();
+            var signInResult = manager.PasswordSignIn(login, password, true, false);
+            if (signInResult != SignInStatus.Success)
+            {
+                return View("Login");
+            }
+            var user = await manager.UserManager.FindByNameAsync(login);
+            manager.SignIn(user, true, true);
+            return RedirectToAction("Index","Home");
         }
 
     }

@@ -8,6 +8,18 @@
 <h2 style="background-color:antiquewhite" class="alert alert-success">Register</h2>
 <h4 style="background-color:antiquewhite">Create a new account.</h4>
 <br />
+
+@if (ViewBag.Message != null)
+{
+    <h4 class=" alert-warning">@ViewBag.Message</h4>
+}
+@if (ViewBag.MessageIf != null)
+{
+    <h4 class=" alert-warning">@ViewBag.MessageIf</h4>
+}
+<div>------------</div>
+@Html.ValidationSummary()
+
 <form method="post">
     @Html.EditorForModel()
     <input type="submit" class="btn btn-primary btn-lg d-grid gap-2 col-6 mx-auto col-lg-offset-1" value="Send" /><br /><br />

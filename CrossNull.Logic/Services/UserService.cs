@@ -4,6 +4,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,15 +21,18 @@ namespace CrossNull.Logic.Services
             this._gameContext = gameContext;
             this._userManager = userManager;
         }
+
+        public BinaryReader Age { get; private set; }
+
         public Result AddUser(RegisterModel registerModel)
         {
             if (registerModel == null)
             {
-                //error
+                return Result.Failure("Fill in all the fields and click Send.");
             }
             if (_gameContext.Users.Any(a => a.Email == registerModel.Email))
             {
-                //error
+                return Result.Failure("Email error. Try changing your email.");
             }
 
             if (_gameContext.Users.Any(a => a.UserName == registerModel.UserName))
@@ -46,9 +50,13 @@ namespace CrossNull.Logic.Services
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
             {
                 //проверить результат операции, и сообщить успешно или нет.
-                return Result.Failure("User doesn't added");
+                return Result.Failure("User couldn't be added");
             }
+            if (registerModel.Age.HasValue)
+            {
+                _userManager.AddClaim(identityUser.Id, new System.Security.Claims.Claim("Age", $"{registerModel.Age}"));
 
+            }
             return Result.Success();//
         }
     }

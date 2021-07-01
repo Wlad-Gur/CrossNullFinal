@@ -1,6 +1,8 @@
 ﻿using CrossNull.Logic.Services;
 using CrossNull.Web.Model;
 using CSharpFunctionalExtensions;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +33,9 @@ namespace CrossNull.Web.Controllers
         [HttpPost]
         public ActionResult Register(RegisterViewModel registerViewModel)
         {
+            // TODO раскоментировать и убедиться, что не нал
+            // var manager = HttpContext.GetOwinContext().Get<SignInManager<IdentityUser, string>>();
+
             string email = registerViewModel.Email;
             Result tf;
             if (ModelState.IsValid)
@@ -39,16 +44,17 @@ namespace CrossNull.Web.Controllers
                 {
                     Email = email,
                     Password = registerViewModel.Password,
-                    UserName = registerViewModel.UserName
+                    UserName = registerViewModel.UserName,
+                    Age = registerViewModel.Age
                 };
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
-                ViewBag.Message = "Oops! Something went wrong!";
-                ModelState.AddModelError("", "Repiat to fill form again");//уровень модели?
+                ViewBag.MessageIf = tf.Error;
+                ModelState.AddModelError("", tf.Error);//уровень модели?
                 //TODO добавить кастoмную ошибку в ModelState.AddError
             }
 
-            ViewBag.Message = "Oops! Something went wrong!";
+            ViewBag.Message = "Repeat to fill form again";
             return View(registerViewModel);
 
         }

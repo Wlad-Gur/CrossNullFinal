@@ -13,6 +13,7 @@ using static CrossNull.Logic.Services.GameService;
 
 namespace CrossNull.Web.Controllers
 {
+    [Authorize]
     public class GameController : Controller
     {
         private readonly IGameService _gameSevice;
