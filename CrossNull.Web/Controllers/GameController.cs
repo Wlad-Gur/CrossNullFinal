@@ -35,6 +35,7 @@ namespace CrossNull.Web.Controllers
         {
             return View();
         }
+        [Authorize]
         [HttpGet]
         public ActionResult NewGame()
         {
@@ -43,6 +44,7 @@ namespace CrossNull.Web.Controllers
         }
 
         // POST
+        [Authorize]
         [HttpPost]
         public ActionResult NewGame(InitViewModel initViewModel)
         {

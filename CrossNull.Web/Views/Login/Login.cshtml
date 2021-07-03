@@ -3,13 +3,20 @@
     ViewBag.Title = "Login";
 }
 
-<h2>Sign In</h2>
-
-<form method="post" style="background-color:antiquewhite" class="row col-lg-push-3">
-    <label class="visually-hidden">Login:</label><br />
-    <input type="text" class="form-control" name="login" /><br /><br />
-    <label>Password:</label><br />
-    <input type="password" class="form-control form-control-lg" name="password" /><br /><br />
-    <input type="submit" class="btn btn-primary btn-lg d-grid gap-2 col-6 mx-auto col-lg-offset-1" value="Send" /><br /><br />
-</form>
+<h2 style="background-color:antiquewhite" class="alert alert-success">Sign In</h2>
+<hr />
+@using (Html.BeginForm("Register", "Account", FormMethod.Get))
+{
+    <h3 style="background-color:paleturquoise" class=" alert alert-danger">
+        Are you registered?
+        <button name="Sign up" value="Sign up">Sign up</button>
+    </h3>
+}
+    <form method="post" style="background-color:antiquewhite" class="row col-lg-push-3">
+        <label class="visually-hidden">Login:</label><br />
+        <input type="text" class="form-control" name="login" /><br /><br />
+        <label>Password:</label><br />
+        <input type="password" class="form-control form-control-lg" name="password" /><br /><br />
+        <input type="submit" class="btn btn-primary btn-lg d-grid gap-2 col-6 mx-auto col-lg-offset-1" value="Send" /><br /><br />
+    </form>
 
