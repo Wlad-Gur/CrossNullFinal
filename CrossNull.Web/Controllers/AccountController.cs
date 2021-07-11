@@ -45,7 +45,8 @@ namespace CrossNull.Web.Controllers
                     Email = email,
                     Password = registerViewModel.Password,
                     UserName = registerViewModel.UserName,
-                    Age = registerViewModel.Age
+                    Age = registerViewModel.Age,
+                  //  Id = registerViewModel.Id
                 };
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");

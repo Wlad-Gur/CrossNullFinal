@@ -8,6 +8,7 @@ namespace CrossNull.Logic.Services
 {
     public class RegisterModel
     {
+        public string Id { get; set; }
         public string UserName { get; set; }
 
         public int? Age { get; set; }
