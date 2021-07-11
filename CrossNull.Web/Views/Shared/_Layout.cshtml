@@ -27,10 +27,21 @@
                     <li>@Html.ActionLink("Play", "NewGame", "Game")</li>
                     <li>@Html.ActionLink("Load Game", "LoadGame", "Home")</li>
                 </ul>
-                <ul class="col-md-2 col-md-push-4 nav nav-tabs ">
-                    <li class="active">@Html.ActionLink("Sign up", "Register", "Account")</li>
-                    <li>@Html.ActionLink("Sign in", "Login", "Login")</li>
-                </ul>
+                @if (HttpContext.Current.User.Identity.IsAuthenticated)
+                {
+                    <ul class="col-md-2 col-md-push-4">
+                        <li class="active" style="color:antiquewhite" >Welcome @HttpContext.Current.User.Identity.Name</li>
+                        <li class="active">@Html.ActionLink("Log out", "LogOut", "Login")</li>
+                    </ul>
+                }
+                else
+                {
+                    <ul class="col-md-2 col-md-push-4 nav nav-tabs ">
+                        <li class="active">@Html.ActionLink("Sign up", "Register", "Account")</li>
+                        <li>@Html.ActionLink("Sign in", "Login", "Login")</li>
+                    </ul>
+                }
+
             </div>
         </div>
     </div>

@@ -46,6 +46,14 @@ namespace CrossNull.Web.Controllers
             manager.SignIn(user, true, true);
             return RedirectToAction("Index","Home");
         }
+        [Authorize]
+        public ActionResult LogOut()
+        {
+            var context = HttpContext.GetOwinContext();
+            context.Authentication.SignOut();
+
+            return RedirectToAction("Login", "Login");
+        }
 
     }
 }
