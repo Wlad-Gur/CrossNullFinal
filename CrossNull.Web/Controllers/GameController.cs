@@ -7,6 +7,7 @@ using CSharpFunctionalExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using static CrossNull.Logic.Services.GameService;
@@ -29,6 +30,19 @@ namespace CrossNull.Web.Controllers
                 return Content(result.Error);
             }
             return View("NewGame", result);
+        }
+
+        public ActionResult LoadAll()
+        {
+            var userPrincipal = User as ClaimsPrincipal;
+            Claim claim = userPrincipal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"); // это ключ Claim, MS сделал http ключ его можно переопределить
+            var result = _gameSevice.LoadAll(claim.Value);
+
+            if (result.IsFailure)
+            {
+                return Content(result.Error);
+            }
+            return View("LoadAll", result.Value);
         }
         // GET: Game
         public ActionResult Index()
@@ -54,9 +68,9 @@ namespace CrossNull.Web.Controllers
             }
             Player playerOne = new Player(PlayerTypes.X, initViewModel.NameOne);
             Player playerTwo = new Player(PlayerTypes.O, initViewModel.NameTwo);
-
-            var result = _gameSevice.StartNew(playerOne, playerTwo);
-
+            var userPrincipal = User as ClaimsPrincipal;
+            Claim claim = userPrincipal.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"); // это ключ Claim, MS сделал http ключ его можно переопределить
+            var result = _gameSevice.StartNew(playerOne, playerTwo, claim.Value);
             return View(result);
         }
 

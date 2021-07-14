@@ -1,0 +1,41 @@
+﻿@using CrossNull.Logic.Models;
+@using CSharpFunctionalExtensions;
+@using CrossNull.Domain;
+@model Dictionary<int, CrossNull.Logic.Models.GameModel>
+@{
+    ViewBag.Title = "LoadAll";
+}
+
+<h2>LoadAll</h2>
+@if (ViewBag.Message != null)
+{
+    <h2>@ViewBag.Message</h2>
+}
+
+<body>
+    <div style="background-color: antiquewhite">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">  Name One player</th>
+                    <th scope="col">  Game state</th>
+                    <th scope="col">  Play</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var game in Model)
+                {
+                <tr>
+                    <th scope="row">@game.Value.Id</th>
+                    <td><p>  @game.Value.PlayerOne.Name</p></td>
+                    <td><p>  @game.Value.State</p></td>
+                    <td><input type="submit" class="btn btn-primary" value="Play" /></td>
+
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+

@@ -243,6 +243,7 @@
     <Content Include="Views\Login\Login.cshtml" />
     <Content Include="Views\Login\PlayerResult.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Game\LoadAll.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

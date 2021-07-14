@@ -58,19 +58,21 @@ namespace CrossNull.Logic.Services
         /// Method loads a collection of all played games from the database
         /// </summary>
         /// <returns>Dictionary with ID and list of games</returns>
-        public Result<Dictionary<int, GameModel>> LoadAll()
+        public Result<Dictionary<int, GameModel>> LoadAll(string userId)
         {
-            Dictionary<int, GameModel> gamesDict = new Dictionary<int, GameModel>();
+            Dictionary<int, GameModel> gamesDict1 = new Dictionary<int, GameModel>();
             try
             {
-                return _db.Games.Select(s => JsonConvert.DeserializeObject<GameModel>(s.Game)).
-                     ToDictionary(d => d.Id);
+                var gamesDict = _db.Games.Where(w => w.UserId == userId).ToList();
+                var gamesDic = gamesDict.Select(s => JsonConvert.DeserializeObject<GameModel>(s.Game)).ToList();
+                gamesDict1 = gamesDic.ToDictionary(d => d.Id);
+                return Result.Success(gamesDict1);
+
             }
             catch (Exception ex) when (ex is DBConcurrencyException || ex is DataException)
             {
                 return Result.Failure<Dictionary<int, GameModel>>("Can't connect to database");
             }
-
         }
         /// <summary>
         /// Start new game
@@ -78,7 +80,7 @@ namespace CrossNull.Logic.Services
         /// <param name="playerOne"> Nickname first player</param>
         /// <param name="playerTwo"> Nickname second player</param>
         /// <returns>Returns model of game</returns>
-        public Result<GameModel> StartNew(Player playerOne, Player playerTwo)
+        public Result<GameModel> StartNew(Player playerOne, Player playerTwo, string userId)
         {
             if (playerOne == null)
             {
@@ -92,6 +94,7 @@ namespace CrossNull.Logic.Services
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
             _gameProg.PlayerTwo = playerTwo;
+            _gameProg.UserId = userId;
             Result result = SaveStep(_gameProg);
             if (result.IsSuccess)
             {
@@ -185,15 +188,16 @@ namespace CrossNull.Logic.Services
             }
             return Result.Success(SaveOrdinaryStep(_gameProg));
         }
-        private Result SaveFirstStep(GameModel _gameProg)
+        private Result SaveFirstStep(GameModel gameProg)
         {
             try
             {
                 _gameStateDb = new GameStateDb();
+                _gameStateDb.UserId = gameProg.UserId;
                 _db.Games.Add(_gameStateDb);
                 _db.SaveChanges();
-                _gameProg.Id = _gameStateDb.Id;
-                _gameStateDb.Game = JsonConvert.SerializeObject(_gameProg);
+                gameProg.Id = _gameStateDb.Id;
+                _gameStateDb.Game = JsonConvert.SerializeObject(gameProg);
                 _db.SaveChanges();
             }
             catch (DBConcurrencyException)

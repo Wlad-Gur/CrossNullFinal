@@ -45,7 +45,6 @@ namespace CrossNull.Logic.Services
             {
                 UserName = registerModel.UserName,
                 Email = registerModel.Email,
-                //  Id = registerModel.Id
             };
 
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
@@ -53,7 +52,6 @@ namespace CrossNull.Logic.Services
                 //проверить результат операции, и сообщить успешно или нет.
                 return Result.Failure("User couldn't be added");
             }
-            registerModel.Id = identityUser.Id;
             if (registerModel.Age.HasValue)
             {
                 _userManager.AddClaim(identityUser.Id, new System.Security.Claims.Claim("Age", $"{registerModel.Age}"));
