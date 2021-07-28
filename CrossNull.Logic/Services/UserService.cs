@@ -42,11 +42,18 @@ namespace CrossNull.Logic.Services
                 return Result.Failure("UserName is uncorrect");
             }
 
+            EmailService emailService = new EmailService();
+            var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage()
+            {
+                Destination = registerModel.Email,
+                Subject = "Сonfirmation your email",
+                Body = "Is it you?",
+            });
             IdentityUser identityUser = new IdentityUser()
             {
                 UserName = registerModel.UserName,
                 Email = registerModel.Email,
-                EmailConfirmed = true //TODO заменить на отправку письма когда заработает отправка писем
+                EmailConfirmed = task.IsCompleted //TODO заменить на отправку письма когда заработает отправка писем
             };
 
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)

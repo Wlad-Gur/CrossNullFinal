@@ -48,13 +48,7 @@ namespace CrossNull.Web.Controllers
                     Age = registerViewModel.Age,
                     //  Id = registerViewModel.Id
                 };
-                EmailService emailService = new EmailService();
-                var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage() {
-                Destination = registerModel.Email,
-                Subject = "Сonfirmation your email",
-                Body = "Is it you?",
-                });
-
+                
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
                 ViewBag.MessageIf = tf.Error;
