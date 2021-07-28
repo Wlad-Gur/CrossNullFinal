@@ -64,7 +64,7 @@ namespace ServiceTest
         //
         #endregion
 
-        [TestMethod]
+       // [TestMethod]
         public void TestUserServiceAddCorrect()
         {
             // Arrange

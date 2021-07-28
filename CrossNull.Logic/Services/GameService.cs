@@ -90,6 +90,10 @@ namespace CrossNull.Logic.Services
             {
                 return Result.Failure<GameModel>("Incorrect name second player");
             }
+            if (userId == null)
+            {
+                return Result.Failure<GameModel>("User not identified");
+            }
             _gameProg = new GameModel();
             _gameProg.PlayerOne = playerOne;
             _gameProg.PlayerActive = playerOne;
@@ -116,7 +120,6 @@ namespace CrossNull.Logic.Services
         public Result<GameResult> NextTurn(GameModel gameModels, int colum, int line)
         {
             Cell cell = new Cell((CellStates)gameModels.PlayerActive.PlayerType, colum, line);
-            //TODO интегрировать логику хода из консоли и сдедать проверки
             if (colum < 0 || colum > 3 || line < 0 || line > 3 || gameModels == null)
             {
                 return Result.Failure<GameResult>("Incorrect data");

@@ -46,8 +46,15 @@ namespace CrossNull.Web.Controllers
                     Password = registerViewModel.Password,
                     UserName = registerViewModel.UserName,
                     Age = registerViewModel.Age,
-                  //  Id = registerViewModel.Id
+                    //  Id = registerViewModel.Id
                 };
+                EmailService emailService = new EmailService();
+                var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage() {
+                Destination = registerModel.Email,
+                Subject = "Сonfirmation your email",
+                Body = "Is it you?",
+                });
+
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
                 ViewBag.MessageIf = tf.Error;
@@ -59,5 +66,23 @@ namespace CrossNull.Web.Controllers
             return View(registerViewModel);
 
         }
+
+        public ActionResult ResetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ResetPassword(string email)
+        {
+            var result = _userService.ResetPassword(email);
+            if (result.IsFailure)
+            {
+                ViewBag.Error = result.Error;
+                return View();
+            }
+            ViewBag.Success = "Success";
+            return View();
+        }
+
     }
 }

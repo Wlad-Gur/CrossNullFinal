@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CrossNull.Logic.Services
@@ -45,6 +46,7 @@ namespace CrossNull.Logic.Services
             {
                 UserName = registerModel.UserName,
                 Email = registerModel.Email,
+                EmailConfirmed = true //TODO заменить на отправку письма когда заработает отправка писем
             };
 
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
@@ -58,6 +60,38 @@ namespace CrossNull.Logic.Services
 
             }
             return Result.Success();//
+        }
+
+        public Result ResetPassword(string email)
+        {
+            string pattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+                @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
+
+            if (string.IsNullOrEmpty(email))
+            {
+                return Result.Failure("Email is empty.");
+            }
+            if (!Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase))
+            {
+                return Result.Failure("Invalid email.");
+            }
+
+            var user = _userManager.FindByEmail(email);
+
+            if (user == null)
+            {
+                return Result.Failure("Invalid email.");
+            }
+
+            var userToken = _userManager.GeneratePasswordResetToken(user.Id);
+            string url = $"/Account/ChangePassword?token={userToken}&userId={user.Id}";
+            _userManager.SendEmail(user.Id, "Change password", url);
+            return Result.Success();
+        }
+
+        public Result SendCode(string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -32,7 +32,12 @@ namespace CrossNull.Logic
                     RequireLowercase = false,
                     RequireNonLetterOrDigit = false,
                     RequireUppercase = false
-                }
+                },
+                EmailService = new EmailService()
+                { },
+                SmsService = new SMSService()
+                { },
+                UserTokenProvider = new EmailTokenProvider<IdentityUser>()
             });
             Bind<IUserService>().To<UserService>();
         }

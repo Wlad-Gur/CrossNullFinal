@@ -14,7 +14,7 @@
 
 <body>
     <div style="background-color: antiquewhite">
-        <table class="table">
+        <table class="table table-hover table-bordered border-primary table-responsive">
             <thead>
                 <tr>
                     <th scope="col">Id</th>
@@ -26,11 +26,11 @@
             <tbody>
                 @foreach (var game in Model)
                 {
-                <tr>
+                <tr class="alert-info">
                     <th scope="row">@game.Value.Id</th>
                     <td><p>  @game.Value.PlayerOne.Name</p></td>
                     <td><p>  @game.Value.State</p></td>
-                    <td><input type="submit" class="btn btn-primary" value="Play" /></td>
+                    <td class="table-active"><a href="~/Game/Step?gameId=@game.Value.Id" class="btn btn-primary" />Play</td>
 
                 </tr>
                 }
