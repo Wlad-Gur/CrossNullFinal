@@ -1,5 +1,6 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.AspNet.Identity;
+using MimeKit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,8 @@ namespace CrossNull.Logic.Services
         public Task SendAsync(IdentityMessage message)
         {
             SmtpClient smtpClient = new SmtpClient();
-            smtpClient.Connect("smtp.gmail.com", 465, true);
-            smtpClient.Authenticate(new NetworkCredential("123qwert88888888@gmail.com", "!123qwert"));
+            smtpClient.Connect("localhost", 1025, false);
+            //smtpClient.Authenticate(new NetworkCredential("123qwert88888888@gmail.com", "!123qwert"));
             //{ Host = "smtp.gmail.com",
             //    EnableSsl = true,
             //    Port = 465,
@@ -24,9 +25,12 @@ namespace CrossNull.Logic.Services
             //    DeliveryMethod = SmtpDeliveryMethod.Network,
             //    DeliveryFormat= SmtpDeliveryFormat.International
             //};
-            //MailMessage mailMessage = new MailMessage("123qwert88888888@gmail.com", message.Destination,
-            //    "Reset password", "Hello ");
-            //smtpClient.Send(mailMessage);
+
+            MimeMessage mailMessage = new MimeMessage(
+                new[] { new MailboxAddress("123qwert88888888@gmail.com") },
+                new[] { new MailboxAddress(message.Destination) },
+                "Reset password", new MessagePart());
+            smtpClient.Send(mailMessage);
             return Task.CompletedTask;
         }
     }

@@ -40,6 +40,7 @@ namespace CrossNull.Logic
                 UserTokenProvider = new EmailTokenProvider<IdentityUser>()
             });
             Bind<IUserService>().To<UserService>();
+            Bind<IIdentityMessageService>().To<EmailService>();
         }
     }
 }

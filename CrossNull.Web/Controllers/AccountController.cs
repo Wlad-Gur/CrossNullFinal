@@ -48,7 +48,7 @@ namespace CrossNull.Web.Controllers
                     Age = registerViewModel.Age,
                     //  Id = registerViewModel.Id
                 };
-                
+
                 tf = _userService.AddUser(registerModel);
                 if (tf.IsSuccess) return RedirectToAction("Login", "Login");
                 ViewBag.MessageIf = tf.Error;
@@ -78,5 +78,15 @@ namespace CrossNull.Web.Controllers
             return View();
         }
 
+        public ActionResult ConfirmEmail(string token, string userId)
+        {
+            //TODO проверка входных параметров
+            var result = _userService.VerifyEmailToken(token, userId);
+            if (result.IsFailure)
+            {
+                return View(result);// TODO если ошибка выводить ошибку в созданном VIEW
+            }
+            return View(result.);// Если все хорошо написать спасибо емаил подтвержден
+        }
     }
 }

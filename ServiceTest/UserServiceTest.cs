@@ -8,6 +8,8 @@ using CrossNull.Data;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 using System.Linq;
+using Moq;
+using System.Threading.Tasks;
 
 namespace ServiceTest
 {
@@ -82,9 +84,13 @@ namespace ServiceTest
             //(System.Data.Entity.DbSet<IdentityUser>)c.Users, (i, _) => i.Id , _userScoreDb);
             UserManager<IdentityUser> userManager = new UserManager<IdentityUser>
                 (new UserStore<IdentityUser>(mockContext.Object));
+            var emailMock = new Mock<IIdentityMessageService>();
+            emailMock.Setup(e => e.SendAsync(It.IsAny<IdentityMessage>())).
+                Returns(()=> Task.CompletedTask);
 
             // Act
-            UserService userService = new UserService(mockContext.Object, userManager);
+            UserService userService = new UserService(mockContext.Object, userManager,
+                emailMock.Object);
             var result = userService.AddUser(registerModel);
 
             // Assert

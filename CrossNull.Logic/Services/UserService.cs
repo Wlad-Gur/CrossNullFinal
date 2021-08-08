@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,11 +17,14 @@ namespace CrossNull.Logic.Services
     {
         private readonly GameContext _gameContext;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IIdentityMessageService emailService;
 
-        public UserService(GameContext gameContext, UserManager<IdentityUser> userManager)
+        public UserService(GameContext gameContext, UserManager<IdentityUser> userManager,
+            IIdentityMessageService emailService)
         {
             this._gameContext = gameContext;
             this._userManager = userManager;
+            this.emailService = emailService;
         }
 
         public BinaryReader Age { get; private set; }
@@ -42,18 +46,11 @@ namespace CrossNull.Logic.Services
                 return Result.Failure("UserName is uncorrect");
             }
 
-            EmailService emailService = new EmailService();
-            var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage()
-            {
-                Destination = registerModel.Email,
-                Subject = "Сonfirmation your email",
-                Body = "Is it you?",
-            });
+
             IdentityUser identityUser = new IdentityUser()
             {
                 UserName = registerModel.UserName,
-                Email = registerModel.Email,
-                EmailConfirmed = task.IsCompleted //TODO заменить на отправку письма когда заработает отправка писем
+                Email = registerModel.Email
             };
 
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
@@ -61,6 +58,24 @@ namespace CrossNull.Logic.Services
                 //проверить результат операции, и сообщить успешно или нет.
                 return Result.Failure("User couldn't be added");
             }
+
+            var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage()
+            {
+                Destination = registerModel.Email,
+                Subject = "Сonfirmation your email",
+                Body = "Is it you?",
+            });
+
+            // генерируем токен для подтверждения регистрации
+            var code = _userManager.GenerateEmailConfirmationTokenAsync(identityUser.Id);
+            // создаем ссылку для подтверждения
+            var callbackUrl = new Url("https://localhost:44335/Login/Login");
+            // отправка письма
+            _userManager.SendEmailAsync(identityUser.Id, "Email confirmation",
+                       "To complete registration follow the link:: <a href=\""
+                                                       + callbackUrl + "\">complete registration</a>");
+
+
             if (registerModel.Age.HasValue)
             {
                 _userManager.AddClaim(identityUser.Id, new System.Security.Claims.Claim("Age", $"{registerModel.Age}"));
@@ -99,6 +114,16 @@ namespace CrossNull.Logic.Services
         public Result SendCode(string userId)
         {
             throw new NotImplementedException();
+        }
+
+        public Result VerifyEmailToken(string token, string userId)
+        {
+            var result = _userManager.ConfirmEmail(userId, token);
+            if (!result.Succeeded)
+            {
+                return Result.Failure("Email no corfirm");
+            }
+            return Result.Success();
         }
     }
 }
