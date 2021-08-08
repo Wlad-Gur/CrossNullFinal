@@ -12,6 +12,10 @@
 }
 
 <p>
-    @Model
+    @if (Model.IsFailure)
+    {
+        @Model.Error
+    }
+
 </p>
 

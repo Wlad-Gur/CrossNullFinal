@@ -83,13 +83,11 @@ namespace CrossNull.Web.Controllers
             //TODO проверка входных параметров
             if (token == null)
             {
-                ViewBag.Error = Result.Failure("Token is empty");
-                return View();
+                return View(Result.Failure("Token is empty"));
             }
             if (userId == null)
             {
-                ViewBag.Error = Result.Failure("UserId incorrect");
-                return View();
+                return View(Result.Failure("UserId incorrect"));
             }
             var result = _userService.VerifyEmailToken(token, userId);
             if (result.IsFailure)
