@@ -81,12 +81,28 @@ namespace CrossNull.Web.Controllers
         public ActionResult ConfirmEmail(string token, string userId)
         {
             //TODO проверка входных параметров
+            if (token == null)
+            {
+                ViewBag.Error = Result.Failure("Token is empty");
+                return View();
+            }
+            if (userId == null)
+            {
+                ViewBag.Error = Result.Failure("UserId incorrect");
+                return View();
+            }
             var result = _userService.VerifyEmailToken(token, userId);
             if (result.IsFailure)
             {
+
                 return View(result);// TODO если ошибка выводить ошибку в созданном VIEW
             }
-            return View(result.);// Если все хорошо написать спасибо емаил подтвержден
+            return RedirectToAction("ChangePassword", "AccountController") /*View(result)*/;// Если все хорошо написать спасибо емаил подтвержден
+        }
+
+        public ActionResult ChangePassword()
+        {
+            return View();
         }
     }
 }

@@ -103,7 +103,7 @@ namespace CrossNull.Web.Controllers
                 }
 
                 List<Result<ActionResult>> resultsList = new List<Result<ActionResult>>();
-
+                // Mistake
                 resultsList.Add(stepResult.When(r => (r.Situation == GameSituation.CellIsExist)).
                 AddData(a => ViewBag.Message = "Cell is busy").
                 AddData(a => ViewBag.Id = currentGame.Value.Id).ReturnView(() => View("Error")));
