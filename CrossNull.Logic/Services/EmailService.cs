@@ -29,7 +29,7 @@ namespace CrossNull.Logic.Services
             MimeMessage mailMessage = new MimeMessage(
                 new[] { new MailboxAddress("123qwert88888888@gmail.com") },
                 new[] { new MailboxAddress(message.Destination) },
-                "Reset password", new MessagePart());
+                "Reset password", new TextPart(MimeKit.Text.TextFormat.Html) { Text = message.Body });
             smtpClient.Send(mailMessage);
             return Task.CompletedTask;
         }

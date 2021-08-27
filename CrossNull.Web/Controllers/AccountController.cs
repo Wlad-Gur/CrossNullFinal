@@ -75,7 +75,7 @@ namespace CrossNull.Web.Controllers
                 return View();
             }
             ViewBag.Success = "Success";
-            return View();
+            return View("Success", new SuccessViewModel("We sent you email with instructions.") );
         }
 
         public ActionResult ConfirmEmail(string token, string userId)
@@ -98,9 +98,40 @@ namespace CrossNull.Web.Controllers
             return RedirectToAction("ChangePassword", "AccountController") /*View(result)*/;// Если все хорошо написать спасибо емаил подтвержден
         }
 
-        public ActionResult ChangePassword()
+        [HttpGet]
+        public ActionResult ChangePassword(string token, string userId)
         {
-            return View();
+            //TODO валидация
+            ChangePassViewModel changePassViewModel = new ChangePassViewModel()
+            {
+                Token = token,
+                UserId = userId,
+            };
+            return View(changePassViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(ChangePassViewModel changePassViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                //TODO выкинуть ошибку
+                return View();
+            }
+            //TODO вызвать метод ResetPassword(string userId, string token, string password)
+            // пранализировать результат и принять решение что выводить
+            var resetPassword = _userService.ResetPassword(changePassViewModel.UserId,
+                changePassViewModel.Token, changePassViewModel.Password);
+            if (resetPassword.IsFailure)
+            {
+                ViewBag.resPassFailure = resetPassword.Error;
+                return View(new ChangePassViewModel()
+                {
+                    Token = changePassViewModel.Token,
+                    UserId = changePassViewModel.UserId,
+                });
+            }
+            return View("Success", new SuccessViewModel("Password changed successful"));
         }
     }
 }

@@ -104,11 +104,31 @@ namespace CrossNull.Logic.Services
             {
                 return Result.Failure("Invalid email.");
             }
+            if (!user.EmailConfirmed)
+            {
+                return Result.Failure("User must confirm his email.");
+            }
 
             var userToken = _userManager.GeneratePasswordResetToken(user.Id);
             string url = $"/Account/ChangePassword?token={userToken}&userId={user.Id}";
             _userManager.SendEmail(user.Id, "Change password", url);
             return Result.Success();
+        }
+
+        public Result ResetPassword(string userId, string token, string password)
+        {
+            var user = _userManager.FindById(userId);
+            if (user == null)
+            {
+                return Result.Failure("Incorrect user");
+            }
+            var identityRes = _userManager.ResetPassword(userId, token, password);
+            if (identityRes.Succeeded)
+            {
+                return Result.Success();
+            }
+            //TODO какое сообщение об ошибки нужно выдать.
+            return Result.Failure("Can't change password");
         }
 
         public Result SendCode(string userId)

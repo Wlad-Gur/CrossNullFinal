@@ -6,7 +6,9 @@ namespace CrossNull.Logic.Services
     {
         Result AddUser(RegisterModel registerModel);
         Result ResetPassword(string email);
+        Result ResetPassword(string userId, string token, string password);
         Result SendCode(string userId);
         Result VerifyEmailToken(string token, string userId);
+
     }
 }
