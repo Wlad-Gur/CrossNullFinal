@@ -97,5 +97,36 @@ namespace ServiceTest
             Assert.IsTrue(result.IsSuccess);
             Assert.IsTrue(_userScoreDb.Count == 1);
         }
+        [TestMethod]
+        public void ResetPasswordTestSuccess()
+        {
+            //Arrange
+            var mockContext = new DbContextMock<GameContext>("111");
+            var mset = new DbSetMock<IdentityUser>(_userScoreDb, (u, _) => u.Id);
+            mockContext.Setup(ctx => ctx.Users).Returns(mset.Object);
+            mockContext.Setup(ctx => ctx.Set<IdentityUser>()).Returns(mset.Object);
+            UserManager<IdentityUser> userManager = new UserManager<IdentityUser>
+                (new UserStore<IdentityUser>(mockContext.Object));
+            var emailMock = new Mock<IIdentityMessageService>();
+
+            emailMock.Setup(e => e.SendAsync(It.IsAny<IdentityMessage>())).
+                Returns(() => Task.CompletedTask);
+            RegisterModel registerModel = new RegisterModel()
+            {
+                UserName = "Oleg",
+                Email = "oleg@gmail.com",
+                Password = "11PPpp22"
+            };
+
+            string email = "oleg@gmail.com";
+
+            //Act
+
+            UserService userService = new UserService(mockContext.Object,
+                userManager, emailMock.Object);
+            var result = userService.ResetPassword(email);
+            //Assert
+            Assert.IsTrue(result.IsSuccess);
+        }
     }
 }

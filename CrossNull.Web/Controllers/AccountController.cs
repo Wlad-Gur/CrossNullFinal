@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace CrossNull.Web.Controllers
 {
@@ -75,7 +76,7 @@ namespace CrossNull.Web.Controllers
                 return View();
             }
             ViewBag.Success = "Success";
-            return View("Success", new SuccessViewModel("We sent you email with instructions.") );
+            return View("Success", new SuccessViewModel("We sent you email with instructions."));
         }
 
         public ActionResult ConfirmEmail(string token, string userId)
@@ -131,7 +132,9 @@ namespace CrossNull.Web.Controllers
                     UserId = changePassViewModel.UserId,
                 });
             }
-            return View("Success", new SuccessViewModel("Password changed successful"));
+            CrossNull.Web.Model.SuccessViewModel successVM = new SuccessViewModel("Password changed successful");
+            return RedirectToRoute(new { controller = "Success", action = "SuccessAct",
+               successVM});
         }
     }
 }

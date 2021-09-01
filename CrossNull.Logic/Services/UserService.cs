@@ -127,7 +127,6 @@ namespace CrossNull.Logic.Services
             {
                 return Result.Success();
             }
-            //TODO какое сообщение об ошибки нужно выдать.
             return Result.Failure("Can't change password");
         }
 
