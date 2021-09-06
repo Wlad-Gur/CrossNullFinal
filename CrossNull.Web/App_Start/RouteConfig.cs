@@ -17,11 +17,10 @@ namespace CrossNull.Web
                 url: "Game/Init/{id}",
                 defaults: new { controller = "Game", action = "NewGame", id = UrlParameter.Optional }
                 );
-            //routes.MapRoute(
-            //    name: "Success",
-            //    url: "{controller}/{action}/{id}",
-            //    defaults: new { controller = "Succsess", action = "Success", id = UrlParameter.Optional }
-            //);
+            routes.MapRoute(
+                name: "Success",
+                url: "{Success}/{SuccessAct}/{successVM}"
+            );
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

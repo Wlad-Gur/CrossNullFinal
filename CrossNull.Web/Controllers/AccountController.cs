@@ -133,8 +133,7 @@ namespace CrossNull.Web.Controllers
                 });
             }
             CrossNull.Web.Model.SuccessViewModel successVM = new SuccessViewModel("Password changed successful");
-            return RedirectToRoute(new { controller = "Success", action = "SuccessAct",
-               successVM});
+            return RedirectToRoute("Success", new {successVM});
         }
     }
 }
