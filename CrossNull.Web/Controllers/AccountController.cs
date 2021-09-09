@@ -76,7 +76,7 @@ namespace CrossNull.Web.Controllers
                 return View();
             }
             ViewBag.Success = "Success";
-            return View("Success", new SuccessViewModel("We sent you email with instructions."));
+            return View("SuccessAct", new SuccessViewModel("We sent you email with instructions."));
         }
 
         public ActionResult ConfirmEmail(string token, string userId)
@@ -133,7 +133,9 @@ namespace CrossNull.Web.Controllers
                 });
             }
             CrossNull.Web.Model.SuccessViewModel successVM = new SuccessViewModel("Password changed successful");
-            return RedirectToRoute("Success", new {successVM});
+            HttpContext.Items.Add("1", successVM);
+            return View("SuccessAct", successVM);
+            //return RedirectToRoute("Success", new { controller = "Success", action = "SuccessAct", successVM });
         }
     }
 }

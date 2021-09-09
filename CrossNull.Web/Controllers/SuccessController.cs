@@ -15,9 +15,10 @@ namespace CrossNull.Web.Controllers
         //{
         //    SuccessVM = successViewModel;
         //}
+
         public ActionResult SuccessAct(SuccessViewModel successVM)
         {
-
+            var obj = HttpContext.Items["1"];
             return View(successVM);
         }
     }

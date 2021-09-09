@@ -1,7 +1,9 @@
-﻿using System;
+﻿using CrossNull.Web.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -19,7 +21,8 @@ namespace CrossNull.Web
                 );
             routes.MapRoute(
                 name: "Success",
-                url: "{Success}/{SuccessAct}/{successVM}"
+                url: "Success/SuccessAct/{id}",
+                defaults: new { controller = "Success", action = "SuccessAct", id = UrlParameter.Optional }
             );
             routes.MapRoute(
                 name: "Default",
