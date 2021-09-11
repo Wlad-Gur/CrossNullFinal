@@ -21,17 +21,17 @@ namespace CrossNull.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            var kernel = new StandardKernel();
-            //TODO как сконфигурировать кернел, чтобы он в контролер сервиса передавал UserId
-            //у кренела есть контекст в логики мы этот контекст кое где иснолизуем
+            //var kernel = new StandardKernel();
+            ////TODO как сконфигурировать кернел, чтобы он в контролер сервиса передавал UserId
+            ////у кренела есть контекст в логики мы этот контекст кое где иснолизуем
 
-            kernel.Load("CrossNull.*.dll");//сканирует текущую папку в кот запущено прилож
-            //ищет в ней файлы по маске regeх рег.выражения загрузит в память и начнет сканировать на наличие типов
-            //кот наследуются от NinjectModule если есть он создает экз наследника и вызывает метод Load().
-            //автоматически регистр. все зависимости.
+            //kernel.Load("CrossNull.*.dll");//сканирует текущую папку в кот запущено прилож
+            ////ищет в ней файлы по маске regeх рег.выражения загрузит в память и начнет сканировать на наличие типов
+            ////кот наследуются от NinjectModule если есть он создает экз наследника и вызывает метод Load().
+            ////автоматически регистр. все зависимости.
 
-            DependencyResolver.SetResolver(new Ninject.Web.Mvc.NinjectDependencyResolver(kernel));// установка в качестве DI контейнера поумолчанию для MVC
-            GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(kernel);//дополнительно регстрирует DI контейнер для WebApi
+            //DependencyResolver.SetResolver(new Ninject.Web.Mvc.NinjectDependencyResolver(kernel));// установка в качестве DI контейнера поумолчанию для MVC
+            //GlobalConfiguration.Configuration.DependencyResolver = new NinjectDependencyResolver(kernel);//дополнительно регстрирует DI контейнер для WebApi
         }
     }
 }

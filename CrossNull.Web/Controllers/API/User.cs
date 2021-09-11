@@ -1,6 +1,8 @@
-﻿namespace CrossNull.Web.Controllers.API
+﻿using System;
+
+namespace CrossNull.Web.Controllers.API
 {
-    internal class User
+    public class User
     {
         public string Name { get; internal set; }
         public int Id { get; internal set; }
