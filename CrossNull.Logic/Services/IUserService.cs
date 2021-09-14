@@ -1,4 +1,5 @@
-﻿using CSharpFunctionalExtensions;
+﻿using CrossNull.Logic.Models;
+using CSharpFunctionalExtensions;
 
 namespace CrossNull.Logic.Services
 {
@@ -9,6 +10,7 @@ namespace CrossNull.Logic.Services
         Result ResetPassword(string userId, string token, string password);
         Result SendCode(string userId);
         Result VerifyEmailToken(string token, string userId);
+        Result<User> FindUserByEmail(string email);
 
     }
 }

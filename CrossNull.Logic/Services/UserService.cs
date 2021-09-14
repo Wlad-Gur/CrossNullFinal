@@ -1,4 +1,5 @@
 ﻿using CrossNull.Data;
+using CrossNull.Logic.Models;
 using CSharpFunctionalExtensions;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -18,6 +19,9 @@ namespace CrossNull.Logic.Services
         private readonly GameContext _gameContext;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IIdentityMessageService emailService;
+        string _pattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
+
 
         public UserService(GameContext gameContext, UserManager<IdentityUser> userManager,
             IIdentityMessageService emailService)
@@ -84,16 +88,31 @@ namespace CrossNull.Logic.Services
             return Result.Success();//
         }
 
+        public Result<User> FindUserByEmail(string email)
+        {
+            if (!Regex.IsMatch(email, _pattern, RegexOptions.IgnoreCase))//TODO add validation
+            {
+                return Result.Failure<User>("Invalid email.");
+            }
+            var user = _userManager.FindByEmail(email);
+            if (user == null)
+            {
+                return Result.Failure<User>("User not found");
+            }
+            User userApi = new User()
+            { Id = user.Id, UserName = user.UserName, Email = user.Email };
+
+            return userApi;
+        }
+
         public Result ResetPassword(string email)
         {
-            string pattern = @"^(?("")(""[^""]+?""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
-                @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9]{2,17}))$";
 
             if (string.IsNullOrEmpty(email))
             {
                 return Result.Failure("Email is empty.");
             }
-            if (!Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase))
+            if (!Regex.IsMatch(email, _pattern, RegexOptions.IgnoreCase))
             {
                 return Result.Failure("Invalid email.");
             }
