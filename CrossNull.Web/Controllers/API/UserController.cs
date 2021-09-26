@@ -14,15 +14,6 @@ namespace CrossNull.Web.Controllers.API
     {
         private readonly IUserService _userService;
 
-        // get countries/show
-        // post countries/show?id=2
-        // post cities/allCitiesShow?country=2
-
-        // get api/countries
-        // get countries/id
-        // get countries/2/cities
-
-
         public UserController(IUserService userService)
         {
             this._userService = userService;
@@ -31,14 +22,25 @@ namespace CrossNull.Web.Controllers.API
         [Route(""), HttpGet]
         public IHttpActionResult GetAllUsers()
         {
-            //TODO привести в рабочее состояние
-            return Ok(new List<User>() { new User()
-            { Id = "1", UserName = "QQQ", Email = "qqq@mail.com" } ,
-            new User()
-            { Id = "1", UserName = "WED", Email = "wed@gmail.com" } });
+            var result = _userService.GetAllUsers();
+            if (result.Value == null)
+            {
+                return Content(HttpStatusCode.NoContent, result);
+            }
+            if (result.IsSuccess)
+            {
+                return Ok(result);
+            }
+            switch (result.Error.ErrorType)
+            {
+                case ErrorTypes.InternalException:
+                    return InternalServerError(new Exception(result.Error.Message));
+                default:
+                    throw new Exception("Unknown error type");
+            }
         }
 
-        [Route("/email/{email}"), HttpGet]// names must be equal
+        [Route("email"), HttpGet]// names must be equal
         public IHttpActionResult GetUserByEmail(string email)
         {
             if (string.IsNullOrEmpty(email))
@@ -47,18 +49,41 @@ namespace CrossNull.Web.Controllers.API
             }
 
             var result = _userService.FindUserByEmail(email);
+            if (result.IsSuccess)
+                return Ok<User>(result.Value);
 
-            if (result.Error == "Invalid email.")
+            switch (result.Error.ErrorType)
             {
-                return BadRequest("Invalid email.");
+                case ErrorTypes.Invalid:
+                    return BadRequest(result.Error.Message);
+                case ErrorTypes.NotFound:
+                    return NotFound();
+                case ErrorTypes.InternalException:
+                    return InternalServerError(new Exception(result.Error.Message));
+                default:
+                    throw new Exception("Unknown error type");
             }
-
-            if (result.Error == "User not found")
+        }
+        [Route("registration"), HttpPost]
+        public IHttpActionResult AddUser([FromBody] RegisterModel registerModel)
+        {
+            var result = _userService.AddUser(registerModel);
+            if (result.IsFailure)
             {
-                return NotFound();
+                return BadRequest(result.Error);
             }
+            return Ok("User added successfully");
+        }
+        [Route("change"), HttpPut]
+        public IHttpActionResult ChanageUser(string ID, [FromBody] RegisterModel registerModel)
+        {
+            return Ok("ChanageUser");
+        }
 
-            return Ok<User>(result.Value);
+        [Route("delete"), HttpDelete]
+        public IHttpActionResult DeleteUser(string ID)
+        {
+            return Ok("DeleteUser");
         }
 
     }

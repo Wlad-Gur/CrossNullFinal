@@ -5,6 +5,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Security.Policy;
@@ -41,15 +42,17 @@ namespace CrossNull.Logic.Services
             }
             if (_gameContext.Users.Any(a => a.Email == registerModel.Email))
             {
-                return Result.Failure("Email error. Try changing your email.");
+                return Result.Failure($"{ErrorTypes.Invalid}" +
+                    $"Email error. Try changing your email.");
             }
 
-            if (_gameContext.Users.Any(a => a.UserName == registerModel.UserName))
+            if (_gameContext.Users.Any(a => a.UserName == registerModel.UserName) ||
+               _userManager.Find(registerModel.UserName, registerModel.Password) != null)
             {
-                //проверить юзера на повторение, существует ли, с пощью коптекста  и юзер менеджера
-                return Result.Failure("UserName is uncorrect");
+                //проверить юзера на повторение, существует ли, с пощью контекста  и юзер менеджера
+                return Result.Failure($"{ ErrorTypes.Invalid}"+
+                "UserName is uncorrect");
             }
-
 
             IdentityUser identityUser = new IdentityUser()
             {
@@ -60,7 +63,7 @@ namespace CrossNull.Logic.Services
             if (!_userManager.Create(identityUser, registerModel.Password).Succeeded)
             {
                 //проверить результат операции, и сообщить успешно или нет.
-                return Result.Failure("User couldn't be added");
+                return Result.Failure($"{ErrorTypes.InternalException} User couldn't be added");
             }
 
             var task = emailService.SendAsync(new Microsoft.AspNet.Identity.IdentityMessage()
@@ -79,7 +82,6 @@ namespace CrossNull.Logic.Services
                        "To complete registration follow the link:: <a href=\""
                                                        + callbackUrl + "\">complete registration</a>");
 
-
             if (registerModel.Age.HasValue)
             {
                 _userManager.AddClaim(identityUser.Id, new System.Security.Claims.Claim("Age", $"{registerModel.Age}"));
@@ -88,21 +90,47 @@ namespace CrossNull.Logic.Services
             return Result.Success();//
         }
 
-        public Result<User> FindUserByEmail(string email)
+        public Result<User, ApiError> FindUserByEmail(string email)
         {
             if (!Regex.IsMatch(email, _pattern, RegexOptions.IgnoreCase))//TODO add validation
             {
-                return Result.Failure<User>("Invalid email.");
+                return Result.Failure<User, ApiError>
+                    (new ApiError("Invalid email.!!!!!!!!!!", ErrorTypes.Invalid));
             }
-            var user = _userManager.FindByEmail(email);
-            if (user == null)
+            try
             {
-                return Result.Failure<User>("User not found");
-            }
-            User userApi = new User()
-            { Id = user.Id, UserName = user.UserName, Email = user.Email };
+                var user = _userManager.FindByEmail(email);
+                if (user == null)
+                {
+                    return Result.Failure<User, ApiError>
+                        (new ApiError("User not found", ErrorTypes.NotFound));
+                }
+                User userApi = new User()
+                { Id = user.Id, UserName = user.UserName, Email = user.Email };
 
-            return userApi;
+                return userApi;
+            }
+            catch (DataException ex)
+            {
+                return Result.Failure<User, ApiError>
+                        (new ApiError(ex.Message, ErrorTypes.InternalException));
+            }
+
+        }
+
+        public Result<IEnumerable<User>, ApiError> GetAllUsers()
+        {
+            try
+            {
+                return _gameContext.Users.
+                Select(s => new User() { Id = s.Id, UserName = s.UserName, Email = s.Email }).
+                ToList();
+            }
+            catch (DataException ex)
+            {
+                return Result.Failure<IEnumerable<User>, ApiError>
+                        (new ApiError(ex.Message, ErrorTypes.InternalException));
+            }
         }
 
         public Result ResetPassword(string email)

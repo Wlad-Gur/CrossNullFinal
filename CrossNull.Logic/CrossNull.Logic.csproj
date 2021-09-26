@@ -95,6 +95,7 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Events\StepEventArgs.cs" />
+    <Compile Include="Services\ApiError.cs" />
     <Compile Include="Services\EmailService.cs" />
     <Compile Include="Services\GameResult.cs" />
     <Compile Include="Services\GameSituation.cs" />
