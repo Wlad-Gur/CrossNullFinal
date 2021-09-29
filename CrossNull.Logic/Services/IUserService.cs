@@ -16,6 +16,6 @@ namespace CrossNull.Logic.Services
         Result<User, ApiError> FindUserByEmail(string email);
         Result<IEnumerable<User>, ApiError> GetAllUsers();
         Result<User, ApiError> ChangeWholeUser(string id, UpdateUserModel updateUserModel);
-
+        Result DeleteUser(string id);
     }
 }

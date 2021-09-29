@@ -163,6 +163,14 @@ namespace CrossNull.Logic.Services
             });
         }
 
+        public Result DeleteUser(string id)
+        {
+            var user = _gameContext.Users.Find(id);
+            _gameContext.Users.Remove(user);
+            _gameContext.SaveChanges();
+            return Result.Success();
+        }
+
         public Result<User, ApiError> FindUserByEmail(string email)
         {
             if (!Regex.IsMatch(email, _pattern, RegexOptions.IgnoreCase))//TODO add validation

@@ -69,12 +69,17 @@ namespace CrossNull.Web.Controllers.API
                 return BadRequest("Incorrect ID");
             }
             var result = _userService.ChangeWholeUser(id, updateUserModel);
-            return Ok("ChanageUser");
+            return Ok("ChanageWholeUser");
         }
 
         [Route("{id}"), HttpDelete]
         public IHttpActionResult DeleteUser(string id)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Incorrect ID");
+            }
+            var result = _userService.DeleteUser(id);
             return Ok("DeleteUser");
         }
 
