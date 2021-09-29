@@ -35,7 +35,7 @@ namespace CrossNull.Web.Controllers
         public ActionResult Register(RegisterViewModel registerViewModel)
         {
             // TODO раскоментировать и убедиться, что не нал
-            // var manager = HttpContext.GetOwinContext().Get<SignInManager<IdentityUser, string>>();
+            var manager = HttpContext.GetOwinContext().Get<SignInManager<IdentityUser, string>>();
 
             string email = registerViewModel.Email;
             Result tf;

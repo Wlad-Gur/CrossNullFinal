@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Helpers\UserManagerHelper.cs" />
     <Compile Include="LogicModule.cs" />
+    <Compile Include="Models\UpdateUserModel.cs" />
     <Compile Include="Models\Cell.cs" />
     <Compile Include="Models\CellStates.cs" />
     <Compile Include="Models\FieldFullEventArgs.cs" />
@@ -103,7 +104,7 @@
     <Compile Include="Services\IStatisticService.cs" />
     <Compile Include="Services\GameService.cs" />
     <Compile Include="Services\IUserService.cs" />
-    <Compile Include="Services\RegisterModel.cs" />
+    <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Services\SMSService.cs" />
     <Compile Include="Services\StatisticService.cs" />
     <Compile Include="Services\UserService.cs" />

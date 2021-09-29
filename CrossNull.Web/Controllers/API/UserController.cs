@@ -1,5 +1,6 @@
 ﻿using CrossNull.Logic.Models;
 using CrossNull.Logic.Services;
+using CrossNull.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,42 +50,39 @@ namespace CrossNull.Web.Controllers.API
             }
 
             var result = _userService.FindUserByEmail(email);
-            if (result.IsSuccess)
-                return Ok<User>(result.Value);
+            return result.ToHttpResult(this);
+        }
 
-            switch (result.Error.ErrorType)
-            {
-                case ErrorTypes.Invalid:
-                    return BadRequest(result.Error.Message);
-                case ErrorTypes.NotFound:
-                    return NotFound();
-                case ErrorTypes.InternalException:
-                    return InternalServerError(new Exception(result.Error.Message));
-                default:
-                    throw new Exception("Unknown error type");
-            }
-        }
-        [Route("registration"), HttpPost]
-        public IHttpActionResult AddUser([FromBody] RegisterModel registerModel)
+
+        [Route(""), HttpPost]
+        public IHttpActionResult AddUser([FromBody] UpdateUserModel updateUserModel)
         {
-            var result = _userService.AddUser(registerModel);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok("User added successfully");
+            var result = _userService.AddUser(updateUserModel);
+            return result.ToHttpResult(this);
         }
-        [Route("change"), HttpPut]
-        public IHttpActionResult ChanageUser(string ID, [FromBody] RegisterModel registerModel)
+
+        [Route("{id}"), HttpPut]
+        public IHttpActionResult ChangeWholeUser(string id, [FromBody]  UpdateUserModel updateUserModel)
         {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Incorrect ID");
+            }
+            var result = _userService.ChangeWholeUser(id, updateUserModel);
             return Ok("ChanageUser");
         }
 
-        [Route("delete"), HttpDelete]
-        public IHttpActionResult DeleteUser(string ID)
+        [Route("{id}"), HttpDelete]
+        public IHttpActionResult DeleteUser(string id)
         {
             return Ok("DeleteUser");
         }
 
+        [Route("{id}"), HttpPatch]
+        public IHttpActionResult DeleteUser(string id, string name, string value)
+        {
+            var user = new User() { Email = value}
+            return Ok("DeleteUser");
+        }
     }
 }

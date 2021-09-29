@@ -7,6 +7,7 @@ namespace CrossNull.Logic.Services
 {
     public interface IUserService
     {
+        Result<User, ApiError> AddUser(UpdateUserModel updateUserModel);
         Result AddUser(RegisterModel registerModel);
         Result ResetPassword(string email);
         Result ResetPassword(string userId, string token, string password);
@@ -14,7 +15,7 @@ namespace CrossNull.Logic.Services
         Result VerifyEmailToken(string token, string userId);
         Result<User, ApiError> FindUserByEmail(string email);
         Result<IEnumerable<User>, ApiError> GetAllUsers();
-
+        Result<User, ApiError> ChangeWholeUser(string id, UpdateUserModel updateUserModel);
 
     }
 }
