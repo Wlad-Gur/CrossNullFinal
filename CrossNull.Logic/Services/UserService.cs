@@ -35,7 +35,7 @@ namespace CrossNull.Logic.Services
 
         public BinaryReader Age { get; private set; }
 
-        public Result<User, ApiError> AddUser(UpdateUserModel updateUserModel)
+        public Result<User, ApiError> AddUser(ApdateUserModel updateUserModel)
         {
             if (updateUserModel == null)
             {
@@ -150,20 +150,19 @@ namespace CrossNull.Logic.Services
 
             return Result.Success();
         }
-        public Result<User, ApiError> ChangeWholeUser(string id, UpdateUserModel updateUserModel)
+        public Result<User, ApiError> ChangeWholeUser(string id, UpdateWholeUserModel updateWholeUserModel)
         {
             var wholeUser = _gameContext.Users.Find(id);
-            wholeUser.UserName = updateUserModel.UserName;
-            wholeUser.Email = updateUserModel.Email;
-            /*wholeUser.PasswordHash =*/
-            var pass = _userManager.ChangePassword(id,
-                wholeUser.PasswordHash, updateUserModel.Password); //UserManager<IdentityUser>.PasswordHasher.HashPassword(updateUserModel.Password);
-                                                                   //???????
+            wholeUser.UserName = updateWholeUserModel.UserName;
+            wholeUser.Email = updateWholeUserModel.Email;
+            _userManager.ChangePassword(id, updateWholeUserModel.OldPassword,
+                updateWholeUserModel.NewPassword); //UserManager<IdentityUser>.PasswordHasher.HashPassword(updateUserModel.Password);
+                                                                                                                 //???????
             _gameContext.SaveChanges();
             return Result.Success<User, ApiError>(new User()
             {
-                UserName = updateUserModel.UserName,
-                Email = updateUserModel.Email
+                UserName = updateWholeUserModel.UserName,
+                Email = updateWholeUserModel.Email
             });
         }
 

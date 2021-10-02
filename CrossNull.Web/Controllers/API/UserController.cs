@@ -62,7 +62,7 @@ namespace CrossNull.Web.Controllers.API
         }
 
         [Route("{id}"), HttpPut]
-        public IHttpActionResult ChangeWholeUser(string id, [FromBody] UpdateUserModel updateUserModel)
+        public IHttpActionResult ChangeWholeUser(string id, [FromBody] UpdateWholeUserModel updateUserModel)
         {
             if (string.IsNullOrEmpty(id))
             {

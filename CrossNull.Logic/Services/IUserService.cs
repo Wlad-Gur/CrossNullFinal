@@ -15,7 +15,7 @@ namespace CrossNull.Logic.Services
         Result VerifyEmailToken(string token, string userId);
         Result<User, ApiError> FindUserByEmail(string email);
         Result<IEnumerable<User>, ApiError> GetAllUsers();
-        Result<User, ApiError> ChangeWholeUser(string id, UpdateUserModel updateUserModel);
+        Result<User, ApiError> ChangeWholeUser(string id, UpdateWholeUserModel updateWholeUserModel);
         Result DeleteUser(string id);
         Result<User, ApiError> PartialChange(string id, string nameProp, string valueProp);
     }
