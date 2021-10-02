@@ -62,7 +62,7 @@ namespace CrossNull.Web.Controllers.API
         }
 
         [Route("{id}"), HttpPut]
-        public IHttpActionResult ChangeWholeUser(string id, [FromBody]  UpdateUserModel updateUserModel)
+        public IHttpActionResult ChangeWholeUser(string id, [FromBody] UpdateUserModel updateUserModel)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -84,10 +84,14 @@ namespace CrossNull.Web.Controllers.API
         }
 
         [Route("{id}"), HttpPatch]
-        public IHttpActionResult DeleteUser(string id, string name, string value)
+        public IHttpActionResult PartialChange(string id, string nameProp, string valueProp)
         {
-            var user = new User() { Email = value}
-            return Ok("DeleteUser");
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest("Incorrect ID");
+            }
+            var result = _userService.PartialChange(id, nameProp, valueProp);
+            return Ok("User change partial");
         }
     }
 }

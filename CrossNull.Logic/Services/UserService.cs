@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -154,7 +155,10 @@ namespace CrossNull.Logic.Services
             var wholeUser = _gameContext.Users.Find(id);
             wholeUser.UserName = updateUserModel.UserName;
             wholeUser.Email = updateUserModel.Email;
-            wholeUser.PasswordHash = updateUserModel.Password; //???????
+            /*wholeUser.PasswordHash =*/
+            var pass = _userManager.ChangePassword(id,
+                wholeUser.PasswordHash, updateUserModel.Password); //UserManager<IdentityUser>.PasswordHasher.HashPassword(updateUserModel.Password);
+                                                                   //???????
             _gameContext.SaveChanges();
             return Result.Success<User, ApiError>(new User()
             {
@@ -212,6 +216,24 @@ namespace CrossNull.Logic.Services
                 return Result.Failure<IEnumerable<User>, ApiError>
                         (new ApiError(ex.Message, ErrorTypes.InternalException));
             }
+        }
+
+        public Result<User, ApiError> PartialChange(string id, string nameProp, string valueProp)
+        {
+            var user = _gameContext.Users.Find(id);
+            PropertyInfo[] properties = user.GetType().GetProperties(); //user.GetType().GetProperties().ToList<PropertyInfo>(). Where(w => w.Name == nameProp).Select(s => s.SetValue(user, valueProp))
+            foreach (var p in properties)
+            {
+                if (p.Name == nameProp)
+                {
+                    p.SetValue(user, valueProp);
+                }
+            }
+            return Result.Success<User, ApiError>(new User()
+            {
+                UserName = user.UserName,
+                Email = user.Email
+            });
         }
 
         public Result ResetPassword(string email)

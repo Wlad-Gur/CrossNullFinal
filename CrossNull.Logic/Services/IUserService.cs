@@ -17,5 +17,6 @@ namespace CrossNull.Logic.Services
         Result<IEnumerable<User>, ApiError> GetAllUsers();
         Result<User, ApiError> ChangeWholeUser(string id, UpdateUserModel updateUserModel);
         Result DeleteUser(string id);
+        Result<User, ApiError> PartialChange(string id, string nameProp, string valueProp);
     }
 }
